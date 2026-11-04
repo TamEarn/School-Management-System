@@ -36,6 +36,7 @@ th{background:#edf7f1;color:#087443}
 .search{max-width:350px}
 .mobile-menu{display:none}
 small{color:#777}
+.form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
 @media(max-width:700px){
 .layout{display:block}
 .sidebar{width:100%;padding:12px}
@@ -93,45 +94,177 @@ small{color:#777}
 
 <!-- STUDENTS -->
 <section id="students" class="section">
+
 <div class="card">
-<h2>Add Student</h2>
+<h2>Student Admission Form</h2>
+<p><small>Complete student admission information.</small></p>
+
 <form id="studentForm">
+
+<h3 class="form-heading">1. Student Information</h3>
+
 <div class="form-grid">
+
 <div>
-<label>Student Name</label>
+<label>Admission Number</label>
+<input id="admissionNo" readonly>
+</div>
+
+<div>
+<label>Student Name *</label>
 <input id="studentName" required placeholder="Enter student name">
 </div>
+
 <div>
-<label>Class</label>
-<input id="studentClass" required placeholder="Enter class">
+<label>Father / Guardian Name *</label>
+<input id="fatherName" required placeholder="Enter father name">
 </div>
+
 <div>
-<label>Phone</label>
-<input id="studentPhone" placeholder="Enter phone number">
+<label>Mother Name</label>
+<input id="motherName" placeholder="Enter mother name">
 </div>
+
 <div>
-<label>School / Campus</label>
-<select id="studentSchool">
+<label>Date of Birth</label>
+<input id="dob" type="date">
+</div>
+
+<div>
+<label>Gender *</label>
+<select id="gender" required>
+<option value="">Select Gender</option>
+<option value="Male">Male</option>
+<option value="Female">Female</option>
+<option value="Other">Other</option>
+</select>
+</div>
+
+<div>
+<label>Admission Date *</label>
+<input id="admissionDate" type="date" required>
+</div>
+
+</div>
+
+<h3 class="form-heading">2. Academic Information</h3>
+
+<div class="form-grid">
+
+<div>
+<label>School / Campus *</label>
+<select id="studentSchool" required>
 <option value="main">Main School</option>
 <option value="branch1">City Campus</option>
 <option value="branch2">Model Campus</option>
 </select>
 </div>
+
+<div>
+<label>Class *</label>
+<select id="studentClass" required>
+<option value="">Select Class</option>
+<option>Play Group</option>
+<option>Nursery</option>
+<option>KG</option>
+<option>Class 1</option>
+<option>Class 2</option>
+<option>Class 3</option>
+<option>Class 4</option>
+<option>Class 5</option>
+<option>Class 6</option>
+<option>Class 7</option>
+<option>Class 8</option>
+<option>Class 9</option>
+<option>Class 10</option>
+<option>Class 11</option>
+<option>Class 12</option>
+</select>
 </div>
-<button class="btn" type="submit">Add Student</button>
+
+<div>
+<label>Section</label>
+<select id="studentSection">
+<option value="">Select Section</option>
+<option>A</option>
+<option>B</option>
+<option>C</option>
+<option>D</option>
+</select>
+</div>
+
+<div>
+<label>Roll Number</label>
+<input id="rollNumber" placeholder="Enter roll number">
+</div>
+
+<div>
+<label>Previous School</label>
+<input id="previousSchool" placeholder="Previous school name">
+</div>
+
+<div>
+<label>Student Status</label>
+<select id="studentStatus">
+<option value="Active">Active</option>
+<option value="Inactive">Inactive</option>
+<option value="Graduated">Graduated</option>
+</select>
+</div>
+
+</div>
+
+<h3 class="form-heading">3. Contact Information</h3>
+
+<div class="form-grid">
+
+<div>
+<label>Father / Guardian Phone *</label>
+<input id="studentPhone" type="tel" required placeholder="03XXXXXXXXX">
+</div>
+
+<div>
+<label>Emergency Contact</label>
+<input id="emergencyContact" type="tel" placeholder="Emergency phone">
+</div>
+
+<div style="grid-column:1/-1">
+<label>Home Address</label>
+<input id="studentAddress" placeholder="Enter complete home address">
+</div>
+
+</div>
+
+<button class="btn" type="submit">Save Student Admission</button>
+
 </form>
 </div>
 
 <div class="card">
 <h2>Students List</h2>
-<input class="search" id="studentSearch" placeholder="Search students..." oninput="searchStudents()">
+
+<input class="search" id="studentSearch"
+placeholder="Search students..."
+oninput="searchStudents()">
+
 <div class="table-wrap">
 <table>
-<thead><tr><th>Name</th><th>Class</th><th>Phone</th><th>School</th></tr></thead>
+<thead>
+<tr>
+<th>Admission No.</th>
+<th>Student Name</th>
+<th>Father Name</th>
+<th>Class</th>
+<th>Section</th>
+<th>Phone</th>
+<th>Status</th>
+</tr>
+</thead>
 <tbody id="studentTable"></tbody>
 </table>
 </div>
 </div>
+
 </section>
 
 <!-- TEACHERS -->
@@ -162,38 +295,14 @@ small{color:#777}
 <h3>Assign Subjects (Maximum 8)</h3>
 
 <div class="subject-grid">
-<div>
-<label>Subject 1</label>
-<input id="subject1" placeholder="Subject 1">
-</div>
-<div>
-<label>Subject 2</label>
-<input id="subject2" placeholder="Subject 2">
-</div>
-<div>
-<label>Subject 3</label>
-<input id="subject3" placeholder="Subject 3">
-</div>
-<div>
-<label>Subject 4</label>
-<input id="subject4" placeholder="Subject 4">
-</div>
-<div>
-<label>Subject 5</label>
-<input id="subject5" placeholder="Subject 5">
-</div>
-<div>
-<label>Subject 6</label>
-<input id="subject6" placeholder="Subject 6">
-</div>
-<div>
-<label>Subject 7</label>
-<input id="subject7" placeholder="Subject 7">
-</div>
-<div>
-<label>Subject 8</label>
-<input id="subject8" placeholder="Subject 8">
-</div>
+<div><label>Subject 1</label><input id="subject1" placeholder="Subject 1"></div>
+<div><label>Subject 2</label><input id="subject2" placeholder="Subject 2"></div>
+<div><label>Subject 3</label><input id="subject3" placeholder="Subject 3"></div>
+<div><label>Subject 4</label><input id="subject4" placeholder="Subject 4"></div>
+<div><label>Subject 5</label><input id="subject5" placeholder="Subject 5"></div>
+<div><label>Subject 6</label><input id="subject6" placeholder="Subject 6"></div>
+<div><label>Subject 7</label><input id="subject7" placeholder="Subject 7"></div>
+<div><label>Subject 8</label><input id="subject8" placeholder="Subject 8"></div>
 </div>
 
 <button class="btn" type="submit">Add Teacher</button>
@@ -232,6 +341,7 @@ small{color:#777}
 </div>
 
 <script>
+
 function showSection(id,button){
 document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
 document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
@@ -248,55 +358,119 @@ branch2:'Model Campus'
 return names[id]||id||'Main School';
 }
 
-/* STUDENTS */
-function renderStudents(){
-if(typeof getStudents!=='function')return;
-const students=getStudents()||[];
-const table=document.getElementById('studentTable');
-table.innerHTML='';
-students.forEach(s=>{
-const row=document.createElement('tr');
-[getSafe(s.name),getSafe(s.class),getSafe(s.phone),getSafe(getSchoolName(s.school))].forEach(value=>{
-const td=document.createElement('td');
-td.textContent=value;
-row.appendChild(td);
-});
-table.appendChild(row);
-});
-document.getElementById('totalStudents').textContent=students.length;
-}
-
 function getSafe(value){
 return value==null?'':String(value);
 }
 
+/* STUDENT ADMISSION NUMBER */
+
+function generateAdmissionNo(){
+if(typeof getStudents!=='function')return 'STD-001';
+
+const students=getStudents()||[];
+let highest=0;
+
+students.forEach(student=>{
+const match=String(student.admissionNo||'').match(/^STD-(\d+)$/);
+if(match)highest=Math.max(highest,Number(match[1]));
+});
+
+return 'STD-'+String(highest+1).padStart(3,'0');
+}
+
+function setAdmissionDefaults(){
+document.getElementById('admissionNo').value=generateAdmissionNo();
+document.getElementById('admissionDate').value=new Date().toISOString().split('T')[0];
+}
+
+/* STUDENTS */
+
+function renderStudents(){
+if(typeof getStudents!=='function')return;
+
+const students=getStudents()||[];
+const table=document.getElementById('studentTable');
+table.innerHTML='';
+
+students.forEach(s=>{
+const row=document.createElement('tr');
+
+[
+s.admissionNo,
+s.name,
+s.fatherName,
+s.class,
+s.section,
+s.phone,
+s.status
+].forEach(value=>{
+const td=document.createElement('td');
+td.textContent=getSafe(value)||'-';
+row.appendChild(td);
+});
+
+table.appendChild(row);
+});
+
+document.getElementById('totalStudents').textContent=students.length;
+}
+
 document.getElementById('studentForm').addEventListener('submit',function(e){
 e.preventDefault();
+
 if(typeof addStudent!=='function'){
 alert('Student function not found in app.js');
 return;
 }
+
 const student={
+admissionNo:document.getElementById('admissionNo').value,
 name:document.getElementById('studentName').value.trim(),
-class:document.getElementById('studentClass').value.trim(),
+fatherName:document.getElementById('fatherName').value.trim(),
+motherName:document.getElementById('motherName').value.trim(),
+dob:document.getElementById('dob').value,
+gender:document.getElementById('gender').value,
+admissionDate:document.getElementById('admissionDate').value,
+school:document.getElementById('studentSchool').value,
+class:document.getElementById('studentClass').value,
+section:document.getElementById('studentSection').value,
+rollNumber:document.getElementById('rollNumber').value.trim(),
+previousSchool:document.getElementById('previousSchool').value.trim(),
+status:document.getElementById('studentStatus').value,
 phone:document.getElementById('studentPhone').value.trim(),
-school:document.getElementById('studentSchool').value
+emergencyContact:document.getElementById('emergencyContact').value.trim(),
+address:document.getElementById('studentAddress').value.trim()
 };
+
+const students=getStudents()||[];
+
+if(students.some(s=>s.admissionNo===student.admissionNo)){
+alert('Admission number already exists. Please refresh and try again.');
+return;
+}
+
 addStudent(student);
+
+alert('Student admission saved successfully!');
+
 this.reset();
+setAdmissionDefaults();
 renderStudents();
 });
 
 function searchStudents(){
 const q=document.getElementById('studentSearch').value.toLowerCase();
+
 document.querySelectorAll('#studentTable tr').forEach(row=>{
 row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
 });
 }
 
 /* TEACHERS */
+
 function renderTeachers(){
 if(typeof getTeachers!=='function')return;
+
 const teachers=getTeachers()||[];
 const table=document.getElementById('teacherTable');
 table.innerHTML='';
@@ -308,8 +482,7 @@ const name=document.createElement('td');
 name.textContent=getSafe(t.name);
 
 const subjects=document.createElement('td');
-const subjectList=Array.isArray(t.subjects)?t.subjects:
-(t.subject?[t.subject]:[]);
+const subjectList=Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[]);
 subjects.textContent=subjectList.join(', ');
 
 const school=document.createElement('td');
@@ -333,6 +506,7 @@ return;
 }
 
 const subjects=[];
+
 for(let i=1;i<=8;i++){
 const value=document.getElementById('subject'+i).value.trim();
 if(value)subjects.push(value);
@@ -356,14 +530,18 @@ renderTeachers();
 
 function searchTeachers(){
 const q=document.getElementById('teacherSearch').value.toLowerCase();
+
 document.querySelectorAll('#teacherTable tr').forEach(row=>{
 row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
 });
 }
 
 /* INITIAL LOAD */
+
 renderStudents();
 renderTeachers();
+setAdmissionDefaults();
+
 </script>
 
 </body>
