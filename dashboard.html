@@ -872,95 +872,72 @@ function changeSchool() {
 
 // STUDENT DATA - DEMO STORAGE
 
-let students = JSON.parse(
-    localStorage.getItem("schoolStudents") || "[]"
-);
+
+// STUDENT DATA - LOCAL STORAGE DATABASE
 
 function renderStudents() {
-
     const table = document.getElementById("studentTable");
-
-    const sample = [
-        {
-            name: "Ali Ahmed",
-            cls: "Class 5",
-            phone: "03001234567",
-            school: "Main School"
-        }
-    ];
-
-    const allStudents = [...sample, ...students];
+    const students = getStudents();
 
     table.innerHTML = "";
 
-    allStudents.forEach(student => {
-
+    students.forEach(student => {
         const row = document.createElement("tr");
 
-        [student.name, student.cls, student.phone, student.school]
-            .forEach(value => {
-                const cell = document.createElement("td");
-                cell.textContent = value;
-                row.appendChild(cell);
-            });
+        [
+            student.name,
+            student.cls,
+            student.phone,
+            student.school
+        ].forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value || "-";
+            row.appendChild(cell);
+        });
 
         table.appendChild(row);
-
     });
 
     document.getElementById("totalStudents").textContent =
-        1250 + students.length;
+        students.length;
 }
 
-document.getElementById("studentForm").addEventListener(
-    "submit", function(e) {
+// ADD STUDENT
 
+document.getElementById("studentForm").addEventListener(
+    "submit",
+    function(e) {
         e.preventDefault();
 
-        const name = document.getElementById("studentName").value;
-        const cls = document.getElementById("studentClass").value;
-        const phone = document.getElementById("studentPhone").value;
-
-        const schoolSelect = document.getElementById("schoolSelect");
-
         const student = {
-            name: name,
-            cls: cls,
-            phone: phone,
-            school: schoolSelect.options[schoolSelect.selectedIndex].text
+            name: document.getElementById("studentName").value.trim(),
+            cls: document.getElementById("studentClass").value,
+            phone: document.getElementById("studentPhone").value.trim(),
+            school: document.getElementById("schoolSelect")
+                .selectedOptions[0].textContent
         };
 
-        students.push(student);
-
-        localStorage.setItem(
-            "schoolStudents",
-            JSON.stringify(students)
-        );
+        addStudent(student);
 
         renderStudents();
-
         this.reset();
 
         alert("Student added successfully!");
-
     }
 );
 
 // SEARCH STUDENTS
 
 function searchStudents() {
-
     const search = document.getElementById("studentSearch")
         .value.toLowerCase();
 
     document.querySelectorAll("#studentTable tr").forEach(row => {
-
         row.style.display = row.textContent.toLowerCase()
             .includes(search) ? "" : "none";
-
     });
-
 }
+
 
 // LOGOUT DEMO
 
