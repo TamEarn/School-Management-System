@@ -7,1018 +7,363 @@
 <title>School Management System</title>
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial, sans-serif;
-}
-
-:root {
-    --green: #087443;
-    --light: #eaf5ef;
-    --dark: #17251e;
-    --white: #ffffff;
-    --gray: #f5f7f6;
-}
-
-body {
-    background: var(--gray);
-    color: var(--dark);
-}
-
-.layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* SIDEBAR */
-
-.sidebar {
-    width: 250px;
-    background: white;
-    border-right: 1px solid #e5eae7;
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-    transition: 0.3s;
-    z-index: 1000;
-}
-
-.sidebar.closed {
-    width: 0;
-    overflow: hidden;
-    border: none;
-}
-
-.logo {
-    padding: 25px 20px;
-    color: var(--green);
-    font-size: 20px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.school-label {
-    padding: 10px 20px;
-    color: #888;
-    font-size: 11px;
-    font-weight: bold;
-}
-
-.menu {
-    padding: 10px;
-}
-
-.menu button {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 13px;
-    margin-bottom: 5px;
-    border: none;
-    border-radius: 8px;
-    background: transparent;
-    color: #555;
-    font-size: 14px;
-    text-align: left;
-    cursor: pointer;
-    white-space: nowrap;
-}
-
-.menu button:hover,
-.menu button.active {
-    background: var(--light);
-    color: var(--green);
-    font-weight: bold;
-}
-
-.menu-icon {
-    width: 30px;
-    font-size: 18px;
-}
-
-/* MAIN AREA */
-
-.main {
-    width: 100%;
-    margin-left: 250px;
-    transition: 0.3s;
-    min-width: 0;
-}
-
-.sidebar.closed ~ .main {
-    margin-left: 0;
-}
-
-.topbar {
-    height: 70px;
-    background: white;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 25px;
-    border-bottom: 1px solid #eee;
-    position: sticky;
-    top: 0;
-    z-index: 500;
-}
-
-.left-top {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
-
-.hamburger {
-    border: none;
-    background: transparent;
-    font-size: 25px;
-    cursor: pointer;
-}
-
-.topbar select {
-    padding: 9px;
-    border: 1px solid #ddd;
-    border-radius: 7px;
-    max-width: 190px;
-}
-
-.admin {
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.content {
-    padding: 25px;
-}
-
-.page-title {
-    font-size: 24px;
-    margin-bottom: 7px;
-}
-
-.subtitle {
-    color: #888;
-    font-size: 13px;
-    margin-bottom: 25px;
-}
-
-/* DASHBOARD CARDS */
-
-.cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
-    margin-bottom: 25px;
-}
-
-.card {
-    background: white;
-    padding: 22px;
-    border-radius: 12px;
-    border: 1px solid #edf0ee;
-}
-
-.card-title {
-    color: #777;
-    font-size: 13px;
-}
-
-.card-number {
-    font-size: 27px;
-    font-weight: bold;
-    margin-top: 13px;
-    color: var(--green);
-}
-
-.card-icon {
-    font-size: 25px;
-    margin-bottom: 12px;
-}
-
-/* PANELS AND TABLES */
-
-.panel {
-    background: white;
-    border-radius: 12px;
-    padding: 22px;
-    margin-bottom: 20px;
-    border: 1px solid #edf0ee;
-}
-
-.panel h3 {
-    margin-bottom: 18px;
-}
-
-.table-wrap {
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 550px;
-}
-
-th, td {
-    text-align: left;
-    padding: 14px;
-    border-bottom: 1px solid #eee;
-    font-size: 13px;
-}
-
-th {
-    color: #777;
-    background: #f8faf9;
-}
-
-.status {
-    background: #e4f5e9;
-    color: var(--green);
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 11px;
-}
-
-.btn {
-    background: var(--green);
-    color: white;
-    padding: 11px 17px;
-    border: none;
-    border-radius: 7px;
-    cursor: pointer;
-}
-
-.btn:hover {
-    background: #065c35;
-}
-
-.input {
-    width: 100%;
-    padding: 12px;
-    margin: 8px 0 15px;
-    border: 1px solid #ddd;
-    border-radius: 7px;
-    background: white;
-}
-
-label {
-    font-size: 13px;
-    font-weight: bold;
-}
-
-.page {
-    display: none;
-}
-
-.page.active {
-    display: block;
-}
-
-.notice {
-    padding: 15px;
-    background: var(--light);
-    color: var(--green);
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.mobile-overlay {
-    display: none;
-}
-
-/* MOBILE RESPONSIVE */
-
-@media(max-width: 900px) {
-    .sidebar {
-        width: 250px;
-    }
-
-    .sidebar.closed {
-        width: 250px;
-        left: -260px;
-    }
-
-    .main {
-        margin-left: 0;
-    }
-
-    .sidebar.closed ~ .main {
-        margin-left: 0;
-    }
-
-    .mobile-overlay.show {
-        display: block;
-        position: fixed;
-        inset: 0;
-        background: rgba(0,0,0,0.35);
-        z-index: 900;
-    }
-
-    .cards {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .content {
-        padding: 17px;
-    }
-}
-
-@media(max-width: 500px) {
-    .cards {
-        grid-template-columns: 1fr 1fr;
-        gap: 10px;
-    }
-
-    .card {
-        padding: 14px;
-    }
-
-    .card-number {
-        font-size: 22px;
-    }
-
-    .topbar {
-        padding: 0 12px;
-    }
-
-    .admin {
-        display: none;
-    }
-
-    .topbar select {
-        max-width: 145px;
-    }
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#222}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#087443;color:white;padding:22px 15px;flex-shrink:0}
+.sidebar h2{margin:5px 0 25px;text-align:center}
+.sidebar button{width:100%;padding:13px;border:0;background:transparent;color:white;text-align:left;border-radius:7px;margin:3px 0;cursor:pointer;font-size:15px}
+.sidebar button:hover,.sidebar button.active{background:#ffffff2b}
+.main{flex:1;padding:25px;min-width:0}
+.header{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:25px}
+.header h1{margin:0;font-size:25px}
+.card{background:white;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 2px 10px #0000000b}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
+.stat h3{color:#777;font-size:14px;margin:0 0 10px}
+.stat strong{font-size:27px;color:#087443}
+.section{display:none}
+.section.active{display:block}
+input,select{width:100%;padding:12px;border:1px solid #d6ded9;border-radius:7px;margin:7px 0 15px;font-size:14px;background:white}
+label{font-weight:600;font-size:14px}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
+.subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
+.btn{background:#087443;color:white;border:0;padding:12px 20px;border-radius:7px;cursor:pointer;font-weight:bold}
+.btn:hover{background:#065b35}
+table{width:100%;border-collapse:collapse;min-width:550px}
+th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:14px;vertical-align:top}
+th{background:#edf7f1;color:#087443}
+.table-wrap{overflow-x:auto}
+.search{max-width:350px}
+.mobile-menu{display:none}
+small{color:#777}
+@media(max-width:700px){
+.layout{display:block}
+.sidebar{width:100%;padding:12px}
+.sidebar h2{margin:5px}
+.sidebar nav{display:flex;overflow-x:auto;gap:5px}
+.sidebar button{white-space:nowrap;width:auto;padding:10px}
+.main{padding:15px}
+.form-grid,.subject-grid{grid-template-columns:1fr}
+.header h1{font-size:21px}
 }
 </style>
 </head>
 
 <body>
 
-<!-- LOAD DATABASE BEFORE DASHBOARD JAVASCRIPT -->
 <script src="js/app.js"></script>
 
 <div class="layout">
 
-<!-- SIDEBAR -->
-
-<aside class="sidebar" id="sidebar">
-
-    <div class="logo">🏫 SchoolPro</div>
-    <div class="school-label">MAIN MENU</div>
-
-    <div class="menu">
-
-        <button class="active" onclick="showPage('dashboard',this)">
-            <span class="menu-icon">▦</span> Dashboard
-        </button>
-
-        <button onclick="showPage('schools',this)">
-            <span class="menu-icon">🏫</span> Schools
-        </button>
-
-        <button onclick="showPage('students',this)">
-            <span class="menu-icon">👨‍🎓</span> Students
-        </button>
-
-        <button onclick="showPage('teachers',this)">
-            <span class="menu-icon">👨‍🏫</span> Teachers
-        </button>
-
-        <button onclick="showPage('attendance',this)">
-            <span class="menu-icon">📅</span> Attendance
-        </button>
-
-        <button onclick="showPage('fees',this)">
-            <span class="menu-icon">💰</span> Fees Management
-        </button>
-
-        <button onclick="showPage('exams',this)">
-            <span class="menu-icon">📝</span> Exams & Results
-        </button>
-
-        <button onclick="showPage('timetable',this)">
-            <span class="menu-icon">🕒</span> Timetable
-        </button>
-
-        <button onclick="showPage('reports',this)">
-            <span class="menu-icon">📊</span> Reports
-        </button>
-
-        <div class="school-label">SYSTEM</div>
-
-        <button onclick="showPage('settings',this)">
-            <span class="menu-icon">⚙️</span> Settings
-        </button>
-
-        <button onclick="logout()">
-            <span class="menu-icon">🚪</span> Logout
-        </button>
-
-    </div>
+<aside class="sidebar">
+<h2>🏫 SchoolPro</h2>
+<nav>
+<button class="active" onclick="showSection('dashboard',this)">Dashboard</button>
+<button onclick="showSection('students',this)">Students</button>
+<button onclick="showSection('teachers',this)">Teachers</button>
+<button onclick="showSection('attendance',this)">Attendance</button>
+<button onclick="showSection('fees',this)">Fees</button>
+<button onclick="showSection('exams',this)">Exams & Results</button>
+<button onclick="showSection('timetable',this)">Timetable</button>
+<button onclick="showSection('reports',this)">Reports</button>
+<button onclick="showSection('settings',this)">Settings</button>
+</nav>
 </aside>
-
-<div class="mobile-overlay" id="overlay"
-     onclick="toggleSidebar()"></div>
-
-<!-- MAIN CONTENT -->
 
 <main class="main">
 
-<header class="topbar">
-
-    <div class="left-top">
-        <button class="hamburger" onclick="toggleSidebar()">☰</button>
-
-        <select id="schoolSelect" onchange="changeSchool()">
-            <option value="main">Main School</option>
-            <option value="branch1">City Campus</option>
-            <option value="branch2">Model Campus</option>
-        </select>
-    </div>
-
-    <div class="admin">👤 Super Admin</div>
-
-</header>
-
-<div class="content">
+<div class="header">
+<h1>School Management System</h1>
+<div id="currentSchool">Main School</div>
+</div>
 
 <!-- DASHBOARD -->
-
-<section class="page active" id="dashboard">
-
-    <h2 class="page-title">Dashboard Overview</h2>
-    <p class="subtitle">Welcome to your School Management System.</p>
-
-    <div class="notice" id="welcomeNotice">
-        Welcome back, Administrator! Manage your schools from one place.
-    </div>
-
-    <div class="cards">
-
-        <div class="card">
-            <div class="card-icon">🏫</div>
-            <div class="card-title">Total Schools</div>
-            <div class="card-number" id="totalSchools">3</div>
-        </div>
-
-        <div class="card">
-            <div class="card-icon">👨‍🎓</div>
-            <div class="card-title">Total Students</div>
-            <div class="card-number" id="totalStudents">0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-icon">👨‍🏫</div>
-            <div class="card-title">Total Teachers</div>
-            <div class="card-number" id="totalTeachers">0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-icon">💰</div>
-            <div class="card-title">Fees Collected</div>
-            <div class="card-number">Rs. 0</div>
-        </div>
-
-    </div>
-
-    <div class="panel">
-        <h3>Recent Activities</h3>
-
-        <div class="table-wrap">
-            <table>
-                <tr>
-                    <th>Activity</th>
-                    <th>Details</th>
-                    <th>Status</th>
-                </tr>
-                <tr>
-                    <td>Student Management</td>
-                    <td>Student records are stored locally</td>
-                    <td><span class="status">Active</span></td>
-                </tr>
-                <tr>
-                    <td>Teacher Management</td>
-                    <td>Teacher records are stored locally</td>
-                    <td><span class="status">Active</span></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-</section>
-
-<!-- SCHOOLS -->
-
-<section class="page" id="schools">
-
-    <h2 class="page-title">Schools Management</h2>
-    <p class="subtitle">Manage multiple schools and campuses.</p>
-
-    <div class="panel">
-        <h3>Registered Schools</h3>
-
-        <div class="table-wrap">
-            <table>
-                <tr>
-                    <th>School Name</th>
-                    <th>Campus</th>
-                    <th>Status</th>
-                </tr>
-                <tr>
-                    <td>Main School</td>
-                    <td>Main Campus</td>
-                    <td><span class="status">Active</span></td>
-                </tr>
-                <tr>
-                    <td>City School</td>
-                    <td>City Campus</td>
-                    <td><span class="status">Active</span></td>
-                </tr>
-                <tr>
-                    <td>Model School</td>
-                    <td>Model Campus</td>
-                    <td><span class="status">Active</span></td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
+<section id="dashboard" class="section active">
+<div class="stats">
+<div class="card stat"><h3>Total Students</h3><strong id="totalStudents">0</strong></div>
+<div class="card stat"><h3>Total Teachers</h3><strong id="totalTeachers">0</strong></div>
+<div class="card stat"><h3>Attendance</h3><strong>0</strong></div>
+<div class="card stat"><h3>Fees</h3><strong>0</strong></div>
+</div>
+<div class="card">
+<h2>Welcome to SchoolPro</h2>
+<p>Manage your school records from one dashboard.</p>
+</div>
 </section>
 
 <!-- STUDENTS -->
+<section id="students" class="section">
+<div class="card">
+<h2>Add Student</h2>
+<form id="studentForm">
+<div class="form-grid">
+<div>
+<label>Student Name</label>
+<input id="studentName" required placeholder="Enter student name">
+</div>
+<div>
+<label>Class</label>
+<input id="studentClass" required placeholder="Enter class">
+</div>
+<div>
+<label>Phone</label>
+<input id="studentPhone" placeholder="Enter phone number">
+</div>
+<div>
+<label>School / Campus</label>
+<select id="studentSchool">
+<option value="main">Main School</option>
+<option value="branch1">City Campus</option>
+<option value="branch2">Model Campus</option>
+</select>
+</div>
+</div>
+<button class="btn" type="submit">Add Student</button>
+</form>
+</div>
 
-<section class="page" id="students">
-
-    <h2 class="page-title">Students Management</h2>
-    <p class="subtitle">Manage student admissions and records.</p>
-
-    <div class="panel">
-        <h3>Add New Student</h3>
-
-        <form id="studentForm">
-
-            <label>Student Name</label>
-            <input class="input" id="studentName"
-                   placeholder="Enter student name" required>
-
-            <label>Class</label>
-            <select class="input" id="studentClass">
-                <option>Class 1</option>
-                <option>Class 2</option>
-                <option>Class 3</option>
-                <option>Class 4</option>
-                <option>Class 5</option>
-                <option>Class 6</option>
-                <option>Class 7</option>
-                <option>Class 8</option>
-                <option>Class 9</option>
-                <option>Class 10</option>
-            </select>
-
-            <label>Parent Phone</label>
-            <input class="input" id="studentPhone"
-                   placeholder="Enter phone number">
-
-            <button class="btn" type="submit">Add Student</button>
-
-        </form>
-    </div>
-
-    <div class="panel">
-        <h3>Student Records</h3>
-
-        <input class="input" id="studentSearch"
-               placeholder="Search students..."
-               oninput="searchStudents()">
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Class</th>
-                        <th>Parent Phone</th>
-                        <th>School</th>
-                    </tr>
-                </thead>
-                <tbody id="studentTable"></tbody>
-            </table>
-        </div>
-    </div>
-
+<div class="card">
+<h2>Students List</h2>
+<input class="search" id="studentSearch" placeholder="Search students..." oninput="searchStudents()">
+<div class="table-wrap">
+<table>
+<thead><tr><th>Name</th><th>Class</th><th>Phone</th><th>School</th></tr></thead>
+<tbody id="studentTable"></tbody>
+</table>
+</div>
+</div>
 </section>
 
 <!-- TEACHERS -->
+<section id="teachers" class="section">
 
-<section class="page" id="teachers">
+<div class="card">
+<h2>Add Teacher</h2>
+<p><small>Enter teacher details and assign up to 8 subjects.</small></p>
 
-    <h2 class="page-title">Teachers Management</h2>
-    <p class="subtitle">Manage teacher information and records.</p>
+<form id="teacherForm">
 
-    <div class="panel">
-        <h3>Add New Teacher</h3>
-
-        <form id="teacherForm">
-
-            <label>Teacher Name</label>
-            <input class="input" id="teacherName"
-                   placeholder="Enter teacher name" required>
-
-            <label>Subject</label>
-            <input class="input" id="teacherSubject"
-                   placeholder="Enter subject" required>
-
-            <label>Department</label>
-            <select class="input" id="teacherDepartment">
-                <option>Science</option>
-                <option>Arts</option>
-                <option>Languages</option>
-                <option>Computer</option>
-                <option>Mathematics</option>
-            </select>
-
-            <button class="btn" type="submit">Add Teacher</button>
-
-        </form>
-    </div>
-
-    <div class="panel">
-        <h3>Teacher Records</h3>
-
-        <input class="input" id="teacherSearch"
-               placeholder="Search teachers..."
-               oninput="searchTeachers()">
-
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Subject</th>
-                        <th>Department</th>
-                        <th>School</th>
-                    </tr>
-                </thead>
-                <tbody id="teacherTable"></tbody>
-            </table>
-        </div>
-    </div>
-
-</section>
-
-<!-- ATTENDANCE -->
-
-<section class="page" id="attendance">
-
-    <h2 class="page-title">Attendance Management</h2>
-    <p class="subtitle">Daily student attendance records.</p>
-
-    <div class="panel">
-        <h3>Today's Attendance</h3>
-
-        <label>Select Date</label>
-        <input class="input" type="date" id="attendanceDate">
-
-        <div class="cards">
-            <div class="card">
-                <div class="card-title">Present</div>
-                <div class="card-number">0</div>
-            </div>
-
-            <div class="card">
-                <div class="card-title">Absent</div>
-                <div class="card-number">0</div>
-            </div>
-        </div>
-
-        <p>Attendance management will be developed in the next stage.</p>
-    </div>
-
-</section>
-
-<!-- FEES -->
-
-<section class="page" id="fees">
-
-    <h2 class="page-title">Fees Management</h2>
-    <p class="subtitle">Manage monthly fees and payments.</p>
-
-    <div class="cards">
-        <div class="card">
-            <div class="card-title">Total Fees</div>
-            <div class="card-number">Rs. 0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Collected</div>
-            <div class="card-number">Rs. 0</div>
-        </div>
-
-        <div class="card">
-            <div class="card-title">Pending</div>
-            <div class="card-number">Rs. 0</div>
-        </div>
-    </div>
-
-    <div class="panel">
-        <h3>Fee Records</h3>
-        <p>Fee invoices, payments and pending balances will be developed in the next stage.</p>
-    </div>
-
-</section>
-
-<!-- EXAMS -->
-
-<section class="page" id="exams">
-
-    <h2 class="page-title">Exams & Results</h2>
-    <p class="subtitle">Manage examinations, marks and student results.</p>
-
-    <div class="panel">
-        <h3>Examination Management</h3>
-        <p>Exam schedules, subjects, marks, grades and result cards will be developed here.</p>
-    </div>
-
-</section>
-
-<!-- TIMETABLE -->
-
-<section class="page" id="timetable">
-
-    <h2 class="page-title">Class Timetable</h2>
-    <p class="subtitle">Manage weekly class schedules.</p>
-
-    <div class="panel">
-        <h3>Weekly Timetable</h3>
-
-        <div class="table-wrap">
-            <table>
-                <tr>
-                    <th>Day</th>
-                    <th>09:00 AM</th>
-                    <th>10:00 AM</th>
-                    <th>11:00 AM</th>
-                </tr>
-                <tr>
-                    <td>Monday</td>
-                    <td>English</td>
-                    <td>Maths</td>
-                    <td>Science</td>
-                </tr>
-                <tr>
-                    <td>Tuesday</td>
-                    <td>Maths</td>
-                    <td>English</td>
-                    <td>Science</td>
-                </tr>
-                <tr>
-                    <td>Wednesday</td>
-                    <td>Science</td>
-                    <td>Maths</td>
-                    <td>English</td>
-                </tr>
-            </table>
-        </div>
-    </div>
-
-</section>
-
-<!-- REPORTS -->
-
-<section class="page" id="reports">
-
-    <h2 class="page-title">Reports</h2>
-    <p class="subtitle">School performance and management reports.</p>
-
-    <div class="panel">
-        <h3>Available Reports</h3>
-        <p>Student reports</p>
-        <p>Attendance reports</p>
-        <p>Fee collection reports</p>
-        <p>Examination reports</p>
-        <p>Teacher reports</p>
-    </div>
-
-</section>
-
-<!-- SETTINGS -->
-
-<section class="page" id="settings">
-
-    <h2 class="page-title">Settings</h2>
-    <p class="subtitle">Manage your school system preferences.</p>
-
-    <div class="panel">
-        <h3>System Settings</h3>
-        <p>School profile</p>
-        <p>Academic year</p>
-        <p>User management</p>
-        <p>Local database configuration</p>
-    </div>
-
-</section>
-
+<div class="form-grid">
+<div>
+<label>Teacher Name</label>
+<input id="teacherName" required placeholder="Enter teacher name">
 </div>
+
+<div>
+<label>School / Campus</label>
+<select id="teacherSchool" required>
+<option value="main">Main School</option>
+<option value="branch1">City Campus</option>
+<option value="branch2">Model Campus</option>
+</select>
+</div>
+</div>
+
+<h3>Assign Subjects (Maximum 8)</h3>
+
+<div class="subject-grid">
+<div>
+<label>Subject 1</label>
+<input id="subject1" placeholder="Subject 1">
+</div>
+<div>
+<label>Subject 2</label>
+<input id="subject2" placeholder="Subject 2">
+</div>
+<div>
+<label>Subject 3</label>
+<input id="subject3" placeholder="Subject 3">
+</div>
+<div>
+<label>Subject 4</label>
+<input id="subject4" placeholder="Subject 4">
+</div>
+<div>
+<label>Subject 5</label>
+<input id="subject5" placeholder="Subject 5">
+</div>
+<div>
+<label>Subject 6</label>
+<input id="subject6" placeholder="Subject 6">
+</div>
+<div>
+<label>Subject 7</label>
+<input id="subject7" placeholder="Subject 7">
+</div>
+<div>
+<label>Subject 8</label>
+<input id="subject8" placeholder="Subject 8">
+</div>
+</div>
+
+<button class="btn" type="submit">Add Teacher</button>
+</form>
+</div>
+
+<div class="card">
+<h2>Teachers List</h2>
+<input class="search" id="teacherSearch" placeholder="Search teacher..." oninput="searchTeachers()">
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Teacher Name</th>
+<th>Subjects</th>
+<th>School / Campus</th>
+</tr>
+</thead>
+<tbody id="teacherTable"></tbody>
+</table>
+</div>
+</div>
+
+</section>
+
+<!-- OTHER SECTIONS -->
+<section id="attendance" class="section"><div class="card"><h2>Attendance</h2><p>Attendance module will be developed next.</p></div></section>
+<section id="fees" class="section"><div class="card"><h2>Fees Management</h2><p>Fees module will be developed next.</p></div></section>
+<section id="exams" class="section"><div class="card"><h2>Exams & Results</h2><p>Examination module will be developed next.</p></div></section>
+<section id="timetable" class="section"><div class="card"><h2>Timetable</h2><p>Timetable module will be developed next.</p></div></section>
+<section id="reports" class="section"><div class="card"><h2>Reports</h2><p>Reports module will be developed next.</p></div></section>
+<section id="settings" class="section"><div class="card"><h2>Settings</h2><p>School management settings.</p></div></section>
+
 </main>
 </div>
 
 <script>
-
-// SIDEBAR
-
-function toggleSidebar() {
-    const sidebar = document.getElementById("sidebar");
-    const overlay = document.getElementById("overlay");
-
-    if (window.innerWidth <= 900) {
-        sidebar.classList.toggle("closed");
-        overlay.classList.toggle("show");
-    } else {
-        sidebar.classList.toggle("closed");
-    }
+function showSection(id,button){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+button.classList.add('active');
 }
 
-// PAGE NAVIGATION
-
-function showPage(page, button) {
-    document.querySelectorAll(".page").forEach(p => {
-        p.classList.remove("active");
-    });
-
-    document.getElementById(page).classList.add("active");
-
-    document.querySelectorAll(".menu button").forEach(b => {
-        b.classList.remove("active");
-    });
-
-    button.classList.add("active");
-
-    if (window.innerWidth <= 900) {
-        document.getElementById("sidebar").classList.add("closed");
-        document.getElementById("overlay").classList.remove("show");
-    }
+function getSchoolName(id){
+const names={
+main:'Main School',
+branch1:'City Campus',
+branch2:'Model Campus'
+};
+return names[id]||id||'Main School';
 }
 
-// SCHOOL SWITCHING
-
-function changeSchool() {
-    const school = document.getElementById("schoolSelect");
-    document.getElementById("welcomeNotice").textContent =
-        "Selected School: " + school.selectedOptions[0].textContent;
+/* STUDENTS */
+function renderStudents(){
+if(typeof getStudents!=='function')return;
+const students=getStudents()||[];
+const table=document.getElementById('studentTable');
+table.innerHTML='';
+students.forEach(s=>{
+const row=document.createElement('tr');
+[getSafe(s.name),getSafe(s.class),getSafe(s.phone),getSafe(getSchoolName(s.school))].forEach(value=>{
+const td=document.createElement('td');
+td.textContent=value;
+row.appendChild(td);
+});
+table.appendChild(row);
+});
+document.getElementById('totalStudents').textContent=students.length;
 }
 
-// STUDENT RECORDS
-
-function renderStudents() {
-    const table = document.getElementById("studentTable");
-    const students = getStudents();
-
-    table.innerHTML = "";
-
-    students.forEach(student => {
-        const row = document.createElement("tr");
-
-        [
-            student.name,
-            student.cls,
-            student.phone,
-            student.school
-        ].forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value || "-";
-            row.appendChild(cell);
-        });
-
-        table.appendChild(row);
-    });
-
-    document.getElementById("totalStudents").textContent =
-        students.length;
+function getSafe(value){
+return value==null?'':String(value);
 }
 
-// ADD STUDENT
+document.getElementById('studentForm').addEventListener('submit',function(e){
+e.preventDefault();
+if(typeof addStudent!=='function'){
+alert('Student function not found in app.js');
+return;
+}
+const student={
+name:document.getElementById('studentName').value.trim(),
+class:document.getElementById('studentClass').value.trim(),
+phone:document.getElementById('studentPhone').value.trim(),
+school:document.getElementById('studentSchool').value
+};
+addStudent(student);
+this.reset();
+renderStudents();
+});
 
-document.getElementById("studentForm").addEventListener(
-    "submit",
-    function(e) {
-        e.preventDefault();
-
-        const student = {
-            name: document.getElementById("studentName").value.trim(),
-            cls: document.getElementById("studentClass").value,
-            phone: document.getElementById("studentPhone").value.trim(),
-            school: document.getElementById("schoolSelect")
-                .selectedOptions[0].textContent
-        };
-
-        addStudent(student);
-
-        renderStudents();
-        this.reset();
-
-        alert("Student added successfully!");
-    }
-);
-
-// SEARCH STUDENTS
-
-function searchStudents() {
-    const search = document.getElementById("studentSearch")
-        .value.toLowerCase();
-
-    document.querySelectorAll("#studentTable tr").forEach(row => {
-        row.style.display = row.textContent.toLowerCase()
-            .includes(search) ? "" : "none";
-    });
+function searchStudents(){
+const q=document.getElementById('studentSearch').value.toLowerCase();
+document.querySelectorAll('#studentTable tr').forEach(row=>{
+row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
+});
 }
 
-// TEACHER RECORDS
+/* TEACHERS */
+function renderTeachers(){
+if(typeof getTeachers!=='function')return;
+const teachers=getTeachers()||[];
+const table=document.getElementById('teacherTable');
+table.innerHTML='';
 
-function renderTeachers() {
-    const table = document.getElementById("teacherTable");
-    const teachers = getTeachers();
+teachers.forEach(t=>{
+const row=document.createElement('tr');
 
-    table.innerHTML = "";
+const name=document.createElement('td');
+name.textContent=getSafe(t.name);
 
-    teachers.forEach(teacher => {
-        const row = document.createElement("tr");
+const subjects=document.createElement('td');
+const subjectList=Array.isArray(t.subjects)?t.subjects:
+(t.subject?[t.subject]:[]);
+subjects.textContent=subjectList.join(', ');
 
-        [
-            teacher.name,
-            teacher.subject,
-            teacher.department,
-            teacher.school
-        ].forEach(value => {
-            const cell = document.createElement("td");
-            cell.textContent = value || "-";
-            row.appendChild(cell);
-        });
+const school=document.createElement('td');
+school.textContent=getSchoolName(t.school);
 
-        table.appendChild(row);
-    });
+row.appendChild(name);
+row.appendChild(subjects);
+row.appendChild(school);
+table.appendChild(row);
+});
 
-    document.getElementById("totalTeachers").textContent =
-        teachers.length;
+document.getElementById('totalTeachers').textContent=teachers.length;
 }
 
-// ADD TEACHER
+document.getElementById('teacherForm').addEventListener('submit',function(e){
+e.preventDefault();
 
-document.getElementById("teacherForm").addEventListener(
-    "submit",
-    function(e) {
-        e.preventDefault();
-
-        const teacher = {
-            name: document.getElementById("teacherName").value.trim(),
-            subject: document.getElementById("teacherSubject").value.trim(),
-            department: document.getElementById("teacherDepartment").value,
-            school: document.getElementById("schoolSelect")
-                .selectedOptions[0].textContent
-        };
-
-        addTeacher(teacher);
-
-        renderTeachers();
-        this.reset();
-
-        alert("Teacher added successfully!");
-    }
-);
-
-// SEARCH TEACHERS
-
-function searchTeachers() {
-    const search = document.getElementById("teacherSearch")
-        .value.toLowerCase();
-
-    document.querySelectorAll("#teacherTable tr").forEach(row => {
-        row.style.display = row.textContent.toLowerCase()
-            .includes(search) ? "" : "none";
-    });
+if(typeof addTeacher!=='function'){
+alert('addTeacher function not found in js/app.js. Please update app.js.');
+return;
 }
 
-// LOGOUT DEMO
-
-function logout() {
-    alert("Login and authentication will be developed in a later stage.");
+const subjects=[];
+for(let i=1;i<=8;i++){
+const value=document.getElementById('subject'+i).value.trim();
+if(value)subjects.push(value);
 }
 
-// INITIALIZE
+if(subjects.length===0){
+alert('Please enter at least one subject.');
+return;
+}
 
+const teacher={
+name:document.getElementById('teacherName').value.trim(),
+subjects:subjects,
+school:document.getElementById('teacherSchool').value
+};
+
+addTeacher(teacher);
+this.reset();
+renderTeachers();
+});
+
+function searchTeachers(){
+const q=document.getElementById('teacherSearch').value.toLowerCase();
+document.querySelectorAll('#teacherTable tr').forEach(row=>{
+row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
+});
+}
+
+/* INITIAL LOAD */
 renderStudents();
 renderTeachers();
-
-document.getElementById("attendanceDate").value =
-    new Date().toISOString().split("T")[0];
-
-if (window.innerWidth <= 900) {
-    document.getElementById("sidebar").classList.add("closed");
-}
-
 </script>
 
 </body>
