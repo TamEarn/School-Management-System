@@ -8,8 +8,10 @@ const DB = {
 
     get(key, fallback = []) {
         try {
-            return JSON.parse(localStorage.getItem(key)) ?? fallback;
-        } catch {
+            const data = localStorage.getItem(key);
+            return data ? JSON.parse(data) : fallback;
+        } catch (error) {
+            console.error("Database read error:", error);
             return fallback;
         }
     },
@@ -20,7 +22,7 @@ const DB = {
 
 };
 
-// INITIAL DATABASE
+/* INITIAL DATABASE */
 
 function initializeDatabase() {
 
@@ -68,7 +70,7 @@ function initializeDatabase() {
 
 }
 
-// SCHOOL FUNCTIONS
+/* SCHOOL FUNCTIONS */
 
 function getSchools() {
     return DB.get("schools");
@@ -78,18 +80,22 @@ function addSchool(name, campus) {
 
     const schools = getSchools();
 
-    schools.push({
+    const school = {
         id: "SCH" + Date.now(),
-        name,
-        campus,
-        status: "Active"
-    });
+        name: name,
+        campus: campus,
+        status: "Active",
+        createdAt: new Date().toISOString()
+    };
+
+    schools.push(school);
 
     DB.save("schools", schools);
 
+    return school;
 }
 
-// STUDENT FUNCTIONS
+/* STUDENT FUNCTIONS */
 
 function getStudents() {
     return DB.get("students");
@@ -99,18 +105,53 @@ function addStudent(student) {
 
     const students = getStudents();
 
-    student.id = "STU" + Date.now();
-    student.createdAt = new Date().toISOString();
+    const newStudent = {
+        ...student,
+        id: "STU" + Date.now(),
+        createdAt: new Date().toISOString()
+    };
 
-    students.push(student);
+    students.push(newStudent);
 
     DB.save("students", students);
 
-    return student;
+    return newStudent;
+}
+
+function updateStudent(id, updatedData) {
+
+    const students = getStudents();
+
+    const index = students.findIndex(
+        student => student.id === id
+    );
+
+    if (index === -1) return false;
+
+    students[index] = {
+        ...students[index],
+        ...updatedData,
+        id: students[index].id
+    };
+
+    DB.save("students", students);
+
+    return true;
+}
+
+function deleteStudent(id) {
+
+    const students = getStudents();
+
+    const updatedStudents = students.filter(
+        student => student.id !== id
+    );
+
+    DB.save("students", updatedStudents);
 
 }
 
-// TEACHER FUNCTIONS
+/* TEACHER FUNCTIONS */
 
 function getTeachers() {
     return DB.get("teachers");
@@ -120,15 +161,56 @@ function addTeacher(teacher) {
 
     const teachers = getTeachers();
 
-    teacher.id = "TCH" + Date.now();
+    const newTeacher = {
+        ...teacher,
+        id: "TCH" + Date.now(),
+        subjects: Array.isArray(teacher.subjects)
+            ? teacher.subjects.slice(0, 8)
+            : [],
+        createdAt: new Date().toISOString()
+    };
 
-    teachers.push(teacher);
+    teachers.push(newTeacher);
 
     DB.save("teachers", teachers);
 
+    return newTeacher;
 }
 
-// ATTENDANCE FUNCTIONS
+function updateTeacher(id, updatedData) {
+
+    const teachers = getTeachers();
+
+    const index = teachers.findIndex(
+        teacher => teacher.id === id
+    );
+
+    if (index === -1) return false;
+
+    teachers[index] = {
+        ...teachers[index],
+        ...updatedData,
+        id: teachers[index].id
+    };
+
+    DB.save("teachers", teachers);
+
+    return true;
+}
+
+function deleteTeacher(id) {
+
+    const teachers = getTeachers();
+
+    const updatedTeachers = teachers.filter(
+        teacher => teacher.id !== id
+    );
+
+    DB.save("teachers", updatedTeachers);
+
+}
+
+/* ATTENDANCE FUNCTIONS */
 
 function getAttendance() {
     return DB.get("attendance");
@@ -138,16 +220,20 @@ function saveAttendance(record) {
 
     const records = getAttendance();
 
-    records.push({
+    const newRecord = {
         ...record,
-        id: "ATT" + Date.now()
-    });
+        id: "ATT" + Date.now(),
+        createdAt: new Date().toISOString()
+    };
+
+    records.push(newRecord);
 
     DB.save("attendance", records);
 
+    return newRecord;
 }
 
-// FEES FUNCTIONS
+/* FEES FUNCTIONS */
 
 function getFees() {
     return DB.get("fees");
@@ -157,16 +243,20 @@ function addFee(payment) {
 
     const fees = getFees();
 
-    fees.push({
+    const newPayment = {
         ...payment,
-        id: "FEE" + Date.now()
-    });
+        id: "FEE" + Date.now(),
+        createdAt: new Date().toISOString()
+    };
+
+    fees.push(newPayment);
 
     DB.save("fees", fees);
 
+    return newPayment;
 }
 
-// EXAM FUNCTIONS
+/* EXAM FUNCTIONS */
 
 function getExams() {
     return DB.get("exams");
@@ -176,16 +266,20 @@ function addExam(exam) {
 
     const exams = getExams();
 
-    exams.push({
+    const newExam = {
         ...exam,
-        id: "EXM" + Date.now()
-    });
+        id: "EXM" + Date.now(),
+        createdAt: new Date().toISOString()
+    };
+
+    exams.push(newExam);
 
     DB.save("exams", exams);
 
+    return newExam;
 }
 
-// TIMETABLE FUNCTIONS
+/* TIMETABLE FUNCTIONS */
 
 function getTimetable() {
     return DB.get("timetable");
@@ -195,17 +289,23 @@ function addTimetable(entry) {
 
     const timetable = getTimetable();
 
-    timetable.push({
+    const newEntry = {
         ...entry,
-        id: "TIME" + Date.now()
-    });
+        id: "TIME" + Date.now(),
+        createdAt: new Date().toISOString()
+    };
+
+    timetable.push(newEntry);
 
     DB.save("timetable", timetable);
 
+    return newEntry;
 }
 
-// START DATABASE
+/* DATABASE START */
 
 initializeDatabase();
 
 console.log("School Management Database Initialized!");
+console.log("Students:", getStudents().length);
+console.log("Teachers:", getTeachers().length);
