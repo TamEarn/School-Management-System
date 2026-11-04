@@ -36,7 +36,7 @@ body {
 
 .sidebar {
     width: 250px;
-    background: #ffffff;
+    background: white;
     border-right: 1px solid #e5eae7;
     position: fixed;
     left: 0;
@@ -100,7 +100,7 @@ body {
     font-size: 18px;
 }
 
-/* MAIN */
+/* MAIN AREA */
 
 .main {
     width: 100%;
@@ -166,7 +166,7 @@ body {
     margin-bottom: 25px;
 }
 
-/* CARDS */
+/* DASHBOARD CARDS */
 
 .cards {
     display: grid;
@@ -199,7 +199,7 @@ body {
     margin-bottom: 12px;
 }
 
-/* SECTIONS */
+/* PANELS AND TABLES */
 
 .panel {
     background: white;
@@ -237,7 +237,7 @@ th {
 
 .status {
     background: #e4f5e9;
-    color: #087443;
+    color: var(--green);
     padding: 5px 10px;
     border-radius: 20px;
     font-size: 11px;
@@ -256,24 +256,18 @@ th {
     background: #065c35;
 }
 
-.btn-secondary {
-    background: #edf4ef;
-    color: var(--green);
-}
-
 .input {
     width: 100%;
     padding: 12px;
     margin: 8px 0 15px;
     border: 1px solid #ddd;
     border-radius: 7px;
+    background: white;
 }
 
-.actions {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-bottom: 18px;
+label {
+    font-size: 13px;
+    font-weight: bold;
 }
 
 .page {
@@ -296,7 +290,7 @@ th {
     display: none;
 }
 
-/* MOBILE */
+/* MOBILE RESPONSIVE */
 
 @media(max-width: 900px) {
     .sidebar {
@@ -364,6 +358,9 @@ th {
 
 <body>
 
+<!-- LOAD DATABASE BEFORE DASHBOARD JAVASCRIPT -->
+<script src="js/app.js"></script>
+
 <div class="layout">
 
 <!-- SIDEBAR -->
@@ -371,7 +368,6 @@ th {
 <aside class="sidebar" id="sidebar">
 
     <div class="logo">🏫 SchoolPro</div>
-
     <div class="school-label">MAIN MENU</div>
 
     <div class="menu">
@@ -457,7 +453,7 @@ th {
     <h2 class="page-title">Dashboard Overview</h2>
     <p class="subtitle">Welcome to your School Management System.</p>
 
-    <div class="notice">
+    <div class="notice" id="welcomeNotice">
         Welcome back, Administrator! Manage your schools from one place.
     </div>
 
@@ -472,19 +468,19 @@ th {
         <div class="card">
             <div class="card-icon">👨‍🎓</div>
             <div class="card-title">Total Students</div>
-            <div class="card-number" id="totalStudents">1250</div>
+            <div class="card-number" id="totalStudents">0</div>
         </div>
 
         <div class="card">
             <div class="card-icon">👨‍🏫</div>
             <div class="card-title">Total Teachers</div>
-            <div class="card-number">85</div>
+            <div class="card-number" id="totalTeachers">0</div>
         </div>
 
         <div class="card">
             <div class="card-icon">💰</div>
             <div class="card-title">Fees Collected</div>
-            <div class="card-number">Rs. 8.5L</div>
+            <div class="card-number">Rs. 0</div>
         </div>
 
     </div>
@@ -493,28 +489,23 @@ th {
         <h3>Recent Activities</h3>
 
         <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Activity</th>
-                <th>Details</th>
-                <th>Status</th>
-            </tr>
-            <tr>
-                <td>New Admission</td>
-                <td>Student admission recorded</td>
-                <td><span class="status">Completed</span></td>
-            </tr>
-            <tr>
-                <td>Fee Collection</td>
-                <td>Monthly fee received</td>
-                <td><span class="status">Paid</span></td>
-            </tr>
-            <tr>
-                <td>Attendance</td>
-                <td>Daily attendance</td>
-                <td><span class="status">Updated</span></td>
-            </tr>
-        </table>
+            <table>
+                <tr>
+                    <th>Activity</th>
+                    <th>Details</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Student Management</td>
+                    <td>Student records are stored locally</td>
+                    <td><span class="status">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Teacher Management</td>
+                    <td>Teacher records are stored locally</td>
+                    <td><span class="status">Active</span></td>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -529,29 +520,30 @@ th {
 
     <div class="panel">
         <h3>Registered Schools</h3>
+
         <div class="table-wrap">
-        <table>
-            <tr>
-                <th>School Name</th>
-                <th>Campus</th>
-                <th>Status</th>
-            </tr>
-            <tr>
-                <td>Main School</td>
-                <td>Main Campus</td>
-                <td><span class="status">Active</span></td>
-            </tr>
-            <tr>
-                <td>City School</td>
-                <td>City Campus</td>
-                <td><span class="status">Active</span></td>
-            </tr>
-            <tr>
-                <td>Model School</td>
-                <td>Model Campus</td>
-                <td><span class="status">Active</span></td>
-            </tr>
-        </table>
+            <table>
+                <tr>
+                    <th>School Name</th>
+                    <th>Campus</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>Main School</td>
+                    <td>Main Campus</td>
+                    <td><span class="status">Active</span></td>
+                </tr>
+                <tr>
+                    <td>City School</td>
+                    <td>City Campus</td>
+                    <td><span class="status">Active</span></td>
+                </tr>
+                <tr>
+                    <td>Model School</td>
+                    <td>Model Campus</td>
+                    <td><span class="status">Active</span></td>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -604,24 +596,17 @@ th {
                oninput="searchStudents()">
 
         <div class="table-wrap">
-        <table>
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Class</th>
-                <th>Parent Phone</th>
-                <th>School</th>
-            </tr>
-            </thead>
-            <tbody id="studentTable">
-            <tr>
-                <td>Ali Ahmed</td>
-                <td>Class 5</td>
-                <td>03001234567</td>
-                <td>Main School</td>
-            </tr>
-            </tbody>
-        </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Class</th>
+                        <th>Parent Phone</th>
+                        <th>School</th>
+                    </tr>
+                </thead>
+                <tbody id="studentTable"></tbody>
+            </table>
         </div>
     </div>
 
@@ -635,28 +620,51 @@ th {
     <p class="subtitle">Manage teacher information and records.</p>
 
     <div class="panel">
+        <h3>Add New Teacher</h3>
+
+        <form id="teacherForm">
+
+            <label>Teacher Name</label>
+            <input class="input" id="teacherName"
+                   placeholder="Enter teacher name" required>
+
+            <label>Subject</label>
+            <input class="input" id="teacherSubject"
+                   placeholder="Enter subject" required>
+
+            <label>Department</label>
+            <select class="input" id="teacherDepartment">
+                <option>Science</option>
+                <option>Arts</option>
+                <option>Languages</option>
+                <option>Computer</option>
+                <option>Mathematics</option>
+            </select>
+
+            <button class="btn" type="submit">Add Teacher</button>
+
+        </form>
+    </div>
+
+    <div class="panel">
         <h3>Teacher Records</h3>
+
+        <input class="input" id="teacherSearch"
+               placeholder="Search teachers..."
+               oninput="searchTeachers()">
+
         <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Name</th>
-                <th>Subject</th>
-                <th>Department</th>
-                <th>Status</th>
-            </tr>
-            <tr>
-                <td>Ahmed Ali</td>
-                <td>Mathematics</td>
-                <td>Science</td>
-                <td><span class="status">Active</span></td>
-            </tr>
-            <tr>
-                <td>Fatima Khan</td>
-                <td>English</td>
-                <td>Languages</td>
-                <td><span class="status">Active</span></td>
-            </tr>
-        </table>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Subject</th>
+                        <th>Department</th>
+                        <th>School</th>
+                    </tr>
+                </thead>
+                <tbody id="teacherTable"></tbody>
+            </table>
         </div>
     </div>
 
@@ -678,15 +686,16 @@ th {
         <div class="cards">
             <div class="card">
                 <div class="card-title">Present</div>
-                <div class="card-number">1100</div>
+                <div class="card-number">0</div>
             </div>
+
             <div class="card">
                 <div class="card-title">Absent</div>
-                <div class="card-number">150</div>
+                <div class="card-number">0</div>
             </div>
         </div>
 
-        <p>Attendance records will be connected to the database in the next development stage.</p>
+        <p>Attendance management will be developed in the next stage.</p>
     </div>
 
 </section>
@@ -701,21 +710,23 @@ th {
     <div class="cards">
         <div class="card">
             <div class="card-title">Total Fees</div>
-            <div class="card-number">Rs. 10L</div>
+            <div class="card-number">Rs. 0</div>
         </div>
+
         <div class="card">
             <div class="card-title">Collected</div>
-            <div class="card-number">Rs. 8.5L</div>
+            <div class="card-number">Rs. 0</div>
         </div>
+
         <div class="card">
             <div class="card-title">Pending</div>
-            <div class="card-number">Rs. 1.5L</div>
+            <div class="card-number">Rs. 0</div>
         </div>
     </div>
 
     <div class="panel">
         <h3>Fee Records</h3>
-        <p>Fee invoices, payments and pending balances will be managed here.</p>
+        <p>Fee invoices, payments and pending balances will be developed in the next stage.</p>
     </div>
 
 </section>
@@ -729,7 +740,7 @@ th {
 
     <div class="panel">
         <h3>Examination Management</h3>
-        <p>Manage exam schedules, subjects, marks, grades and result cards here.</p>
+        <p>Exam schedules, subjects, marks, grades and result cards will be developed here.</p>
     </div>
 
 </section>
@@ -743,33 +754,34 @@ th {
 
     <div class="panel">
         <h3>Weekly Timetable</h3>
+
         <div class="table-wrap">
-        <table>
-            <tr>
-                <th>Day</th>
-                <th>09:00 AM</th>
-                <th>10:00 AM</th>
-                <th>11:00 AM</th>
-            </tr>
-            <tr>
-                <td>Monday</td>
-                <td>English</td>
-                <td>Maths</td>
-                <td>Science</td>
-            </tr>
-            <tr>
-                <td>Tuesday</td>
-                <td>Maths</td>
-                <td>English</td>
-                <td>Science</td>
-            </tr>
-            <tr>
-                <td>Wednesday</td>
-                <td>Science</td>
-                <td>Maths</td>
-                <td>English</td>
-            </tr>
-        </table>
+            <table>
+                <tr>
+                    <th>Day</th>
+                    <th>09:00 AM</th>
+                    <th>10:00 AM</th>
+                    <th>11:00 AM</th>
+                </tr>
+                <tr>
+                    <td>Monday</td>
+                    <td>English</td>
+                    <td>Maths</td>
+                    <td>Science</td>
+                </tr>
+                <tr>
+                    <td>Tuesday</td>
+                    <td>Maths</td>
+                    <td>English</td>
+                    <td>Science</td>
+                </tr>
+                <tr>
+                    <td>Wednesday</td>
+                    <td>Science</td>
+                    <td>Maths</td>
+                    <td>English</td>
+                </tr>
+            </table>
         </div>
     </div>
 
@@ -805,7 +817,7 @@ th {
         <p>School profile</p>
         <p>Academic year</p>
         <p>User management</p>
-        <p>Database configuration</p>
+        <p>Local database configuration</p>
     </div>
 
 </section>
@@ -819,7 +831,6 @@ th {
 // SIDEBAR
 
 function toggleSidebar() {
-
     const sidebar = document.getElementById("sidebar");
     const overlay = document.getElementById("overlay");
 
@@ -834,7 +845,6 @@ function toggleSidebar() {
 // PAGE NAVIGATION
 
 function showPage(page, button) {
-
     document.querySelectorAll(".page").forEach(p => {
         p.classList.remove("active");
     });
@@ -853,27 +863,15 @@ function showPage(page, button) {
     }
 }
 
-// SCHOOL SWITCHING - DEMO
+// SCHOOL SWITCHING
 
 function changeSchool() {
-
-    const school = document.getElementById("schoolSelect").value;
-
-    const schoolNames = {
-        main: "Main School",
-        branch1: "City Campus",
-        branch2: "Model Campus"
-    };
-
-    document.querySelector(".notice").textContent =
-        "Selected School: " + schoolNames[school];
-
+    const school = document.getElementById("schoolSelect");
+    document.getElementById("welcomeNotice").textContent =
+        "Selected School: " + school.selectedOptions[0].textContent;
 }
 
-// STUDENT DATA - DEMO STORAGE
-
-
-// STUDENT DATA - LOCAL STORAGE DATABASE
+// STUDENT RECORDS
 
 function renderStudents() {
     const table = document.getElementById("studentTable");
@@ -938,16 +936,81 @@ function searchStudents() {
     });
 }
 
+// TEACHER RECORDS
+
+function renderTeachers() {
+    const table = document.getElementById("teacherTable");
+    const teachers = getTeachers();
+
+    table.innerHTML = "";
+
+    teachers.forEach(teacher => {
+        const row = document.createElement("tr");
+
+        [
+            teacher.name,
+            teacher.subject,
+            teacher.department,
+            teacher.school
+        ].forEach(value => {
+            const cell = document.createElement("td");
+            cell.textContent = value || "-";
+            row.appendChild(cell);
+        });
+
+        table.appendChild(row);
+    });
+
+    document.getElementById("totalTeachers").textContent =
+        teachers.length;
+}
+
+// ADD TEACHER
+
+document.getElementById("teacherForm").addEventListener(
+    "submit",
+    function(e) {
+        e.preventDefault();
+
+        const teacher = {
+            name: document.getElementById("teacherName").value.trim(),
+            subject: document.getElementById("teacherSubject").value.trim(),
+            department: document.getElementById("teacherDepartment").value,
+            school: document.getElementById("schoolSelect")
+                .selectedOptions[0].textContent
+        };
+
+        addTeacher(teacher);
+
+        renderTeachers();
+        this.reset();
+
+        alert("Teacher added successfully!");
+    }
+);
+
+// SEARCH TEACHERS
+
+function searchTeachers() {
+    const search = document.getElementById("teacherSearch")
+        .value.toLowerCase();
+
+    document.querySelectorAll("#teacherTable tr").forEach(row => {
+        row.style.display = row.textContent.toLowerCase()
+            .includes(search) ? "" : "none";
+    });
+}
 
 // LOGOUT DEMO
 
 function logout() {
-    alert("Firebase authentication will be connected later.");
+    alert("Login and authentication will be developed in a later stage.");
 }
 
 // INITIALIZE
 
 renderStudents();
+renderTeachers();
 
 document.getElementById("attendanceDate").value =
     new Date().toISOString().split("T")[0];
@@ -956,11 +1019,7 @@ if (window.innerWidth <= 900) {
     document.getElementById("sidebar").classList.add("closed");
 }
 
-    
 </script>
-    
-</body>
 
-<script src="js/app.js"></script>
-    
+</body>
 </html>
