@@ -232,7 +232,118 @@ small{color:#777}.form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
 </div>
 </section>
 
-<section id="fees" class="section"><div class="card"><h2>Fees Management</h2><p>Fees module will be developed next.</p></div></section>
+<!-- FEES MANAGEMENT -->
+<section id="fees" class="section">
+
+<div class="card">
+<h2>Monthly Fee Settings</h2>
+<p><small>Set the standard monthly fee. You can also change the fee individually for each student.</small></p>
+
+<div class="form-grid">
+<div>
+<label>Default Monthly Fee (PKR)</label>
+<input type="number" id="defaultMonthlyFee" min="0" placeholder="Enter monthly fee">
+</div>
+<div>
+<label>Challan Due Date</label>
+<input type="date" id="feeDueDate">
+</div>
+</div>
+
+<button class="btn" type="button" onclick="saveFeeSettings()">Save Fee Settings</button>
+</div>
+
+<div class="card">
+<h2>Generate Monthly Challans</h2>
+
+<div class="form-grid">
+<div>
+<label>Fee Month</label>
+<input type="month" id="challanMonth">
+</div>
+<div>
+<label>Additional Fee (Optional)</label>
+<input type="number" id="additionalFee" min="0" value="0">
+</div>
+</div>
+
+<div class="attendance-actions">
+<button class="btn" onclick="generateAllChallans()">Generate All Students Challans</button>
+<button class="btn btn-secondary" onclick="renderFeeRecords()">Refresh Records</button>
+</div>
+
+<p><small>Only active students will receive a challan. Duplicate challans for the same student and month will not be generated.</small></p>
+</div>
+
+<div class="card">
+<h2>Student Fee Management</h2>
+
+<input class="search" id="feeStudentSearch" placeholder="Search student..." oninput="renderFeeStudents()">
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Admission No.</th>
+<th>Student Name</th>
+<th>Father Name</th>
+<th>Class</th>
+<th>Monthly Fee</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="feeStudentTable"></tbody>
+</table>
+</div>
+</div>
+
+<div class="card">
+<h2>Monthly Challan Records</h2>
+
+<div class="form-grid">
+<div>
+<label>Filter Month</label>
+<input type="month" id="feeRecordMonth" onchange="renderFeeRecords()">
+</div>
+<div>
+<label>Payment Status</label>
+<select id="feeStatusFilter" onchange="renderFeeRecords()">
+<option value="all">All</option>
+<option value="Unpaid">Unpaid</option>
+<option value="Partial">Partial</option>
+<option value="Paid">Paid</option>
+</select>
+</div>
+</div>
+
+<div class="summary-grid">
+<div class="summary-box"><span>Total Challans</span><strong id="feeTotalChallans">0</strong></div>
+<div class="summary-box"><span>Total Amount</span><strong id="feeTotalAmount">0</strong></div>
+<div class="summary-box"><span>Received</span><strong id="feeReceived">0</strong></div>
+<div class="summary-box"><span>Remaining</span><strong id="feeRemaining">0</strong></div>
+</div>
+
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Challan No.</th>
+<th>Student</th>
+<th>Class</th>
+<th>Month</th>
+<th>Total Fee</th>
+<th>Paid</th>
+<th>Balance</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+<tbody id="feeRecordTable"></tbody>
+</table>
+</div>
+</div>
+
+</section>
 <section id="exams" class="section"><div class="card"><h2>Exams & Results</h2><p>Examination module will be developed next.</p></div></section>
 <section id="timetable" class="section"><div class="card"><h2>Timetable</h2><p>Timetable module will be developed next.</p></div></section>
 <section id="reports" class="section"><div class="card"><h2>Reports</h2><p>Reports module will be developed next.</p></div></section>
