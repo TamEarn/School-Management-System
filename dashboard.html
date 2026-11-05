@@ -4,13 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>School Management System</title>
-
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#222}
 .layout{display:flex;min-height:100vh}
 .sidebar{width:240px;background:#087443;color:white;padding:22px 15px;flex-shrink:0}
-.sidebar h2{margin:5px 0 25px;text-align:center}
+.sidebar h2{text-align:center;margin:5px 0 25px}
 .sidebar button{width:100%;padding:13px;border:0;background:transparent;color:white;text-align:left;border-radius:7px;margin:3px 0;cursor:pointer;font-size:15px}
 .sidebar button:hover,.sidebar button.active{background:#ffffff2b}
 .main{flex:1;padding:25px;min-width:0}
@@ -20,56 +19,48 @@ body{margin:0;font-family:Arial,sans-serif;background:#f4f7f5;color:#222}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:15px}
 .stat h3{color:#777;font-size:14px;margin:0 0 10px}
 .stat strong{font-size:27px;color:#087443}
-.section{display:none}
-.section.active{display:block}
+.section{display:none}.section.active{display:block}
 input,select{width:100%;padding:12px;border:1px solid #d6ded9;border-radius:7px;margin:7px 0 15px;font-size:14px;background:white}
 label{font-weight:600;font-size:14px}
-.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
-.subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
+.form-grid,.subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
 .btn{background:#087443;color:white;border:0;padding:12px 20px;border-radius:7px;cursor:pointer;font-weight:bold}
 .btn:hover{background:#065b35}
 .btn-secondary{background:#777;margin-left:7px}
-.btn-secondary:hover{background:#555}
 .btn-edit{background:#e9f7f0;color:#087443;padding:7px 12px;border:0;border-radius:5px;cursor:pointer;font-weight:bold}
 table{width:100%;border-collapse:collapse;min-width:650px}
 th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:14px;vertical-align:top}
 th{background:#edf7f1;color:#087443}
-.table-wrap{overflow-x:auto}
-.search{max-width:350px}
-small{color:#777}
-.form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
+.table-wrap{overflow-x:auto}.search{max-width:350px}
+small{color:#777}.form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
 .subject-item{display:flex;align-items:center;gap:7px}
 .subject-item input{flex:1;min-width:0}
 .subject-remove{border:0;background:#fdecec;color:#a32121;padding:9px 11px;border-radius:6px;cursor:pointer;margin-top:-8px}
-.teacher-photo-preview{width:105px;height:105px;border:1px dashed #b8c9bf;border-radius:9px;object-fit:cover;display:block;margin:8px 0 15px;background:#f7faf8}
+.teacher-photo-preview{width:105px;height:105px;border:1px dashed #b8c9bf;border-radius:9px;object-fit:cover;margin:8px 0 15px;background:#f7faf8}
 .teacher-thumb{width:48px;height:48px;object-fit:cover;border-radius:50%;border:1px solid #ddd}
-.btn-view{background:#087443;color:white;padding:7px 12px;border:0;border-radius:5px;cursor:pointer;font-weight:bold;margin:2px}
-.btn-print{background:#555;color:white;padding:7px 12px;border:0;border-radius:5px;cursor:pointer;font-weight:bold;margin:2px}
+.btn-view{background:#087443;color:white;padding:7px 12px;border:0;border-radius:5px;cursor:pointer;margin:2px}
+.attendance-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}
+.attendance-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.btn-small{padding:8px 12px;font-size:13px}
+@media print{.no-print{display:none!important}.main{padding:0}.card{box-shadow:none}}
 @media(max-width:700px){
-.layout{display:block}
-.sidebar{width:100%;padding:12px}
-.sidebar h2{margin:5px}
+.layout{display:block}.sidebar{width:100%;padding:12px}.sidebar h2{margin:5px}
 .sidebar nav{display:flex;overflow-x:auto;gap:5px}
 .sidebar button{white-space:nowrap;width:auto;padding:10px}
-.main{padding:15px}
-.form-grid,.subject-grid{grid-template-columns:1fr}
+.main{padding:15px}.form-grid,.subject-grid{grid-template-columns:1fr}
 .header h1{font-size:21px}
 }
 </style>
 </head>
-
 <body>
-
 <script src="js/app.js"></script>
-
 <div class="layout">
-
 <aside class="sidebar">
 <h2>🏫 SchoolPro</h2>
 <nav>
 <button class="active" onclick="showSection('dashboard',this)">Dashboard</button>
 <button onclick="showSection('students',this)">Students</button>
 <button onclick="showSection('teachers',this)">Teachers</button>
+<button onclick="showSection('staff',this)">Other Staff</button>
 <button onclick="showSection('attendance',this)">Attendance</button>
 <button onclick="showSection('fees',this)">Fees</button>
 <button onclick="showSection('exams',this)">Exams & Results</button>
@@ -78,993 +69,99 @@ small{color:#777}
 <button onclick="showSection('settings',this)">Settings</button>
 </nav>
 </aside>
-
 <main class="main">
+<div class="header"><h1>School Management System</h1><div id="currentSchool">Main School</div></div>
 
-<div class="header">
-<h1>School Management System</h1>
-<div id="currentSchool">Main School</div>
-</div>
-
-<!-- DASHBOARD -->
 <section id="dashboard" class="section active">
 <div class="stats">
 <div class="card stat"><h3>Total Students</h3><strong id="totalStudents">0</strong></div>
 <div class="card stat"><h3>Total Teachers</h3><strong id="totalTeachers">0</strong></div>
-<div class="card stat"><h3>Attendance</h3><strong>0</strong></div>
+<div class="card stat"><h3>Today Attendance</h3><strong id="todayAttendance">0%</strong></div>
 <div class="card stat"><h3>Fees</h3><strong>0</strong></div>
 </div>
-<div class="card">
-<h2>Welcome to SchoolPro</h2>
-<p>Manage your school records from one dashboard.</p>
-</div>
+<div class="card"><h2>Welcome to SchoolPro</h2><p>Manage your school records from one dashboard.</p></div>
 </section>
 
-<!-- STUDENTS -->
 <section id="students" class="section">
-
 <div class="card">
 <h2 id="studentFormTitle">Student Admission Form</h2>
 <p><small>Enter student information. Admission number can be entered manually.</small></p>
-
 <form id="studentForm">
-
 <h3 class="form-heading">1. Student Information</h3>
-
 <div class="form-grid">
-
-<div>
-<label>Admission Number</label>
-<input id="admissionNo" placeholder="Enter admission number">
+<div><label>Admission Number</label><input id="admissionNo" placeholder="Enter admission number"></div>
+<div><label>Student Name *</label><input id="studentName" required placeholder="Enter student name"></div>
+<div><label>Father / Guardian Name *</label><input id="fatherName" required placeholder="Enter father name"></div>
+<div><label>Date of Birth</label><input id="dob" type="date"></div>
+<div><label>Gender *</label><select id="gender" required><option value="">Select Gender</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+<div><label>Admission Date (Optional)</label><input id="admissionDate" type="date"></div>
 </div>
-
-<div>
-<label>Student Name *</label>
-<input id="studentName" required placeholder="Enter student name">
-</div>
-
-<div>
-<label>Father / Guardian Name *</label>
-<input id="fatherName" required placeholder="Enter father name">
-</div>
-
-<div>
-<label>Date of Birth</label>
-<input id="dob" type="date">
-</div>
-
-<div>
-<label>Gender *</label>
-<select id="gender" required>
-<option value="">Select Gender</option>
-<option value="Male">Male</option>
-<option value="Female">Female</option>
-<option value="Other">Other</option>
-</select>
-</div>
-
-<div>
-<label>Admission Date (Optional)</label>
-<input id="admissionDate" type="date">
-</div>
-
-</div>
-
 <h3 class="form-heading">2. Academic Information</h3>
-
 <div class="form-grid">
-
-<div>
-<label>School / Campus *</label>
-<select id="studentSchool" required>
-<option value="main">Main School</option>
-<option value="branch1">City Campus</option>
-<option value="branch2">Model Campus</option>
-</select>
+<div><label>School / Campus *</label><select id="studentSchool" required><option value="main">Main School</option><option value="branch1">City Campus</option><option value="branch2">Model Campus</option></select></div>
+<div><label>Class *</label><select id="studentClass" required>
+<option value="">Select Class</option><option>Play Group</option><option>Nursery</option><option>KG</option>
+<option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option>
+</select></div>
+<div><label>Section</label><select id="studentSection"><option value="">Select Section</option><option>Primary</option><option>Middle</option><option>Secondary</option><option>Higher Secondary</option></select></div>
+<div><label>Roll Number</label><input id="rollNumber" placeholder="Enter roll number"></div>
+<div><label>Previous School</label><input id="previousSchool" placeholder="Previous school name"></div>
+<div><label>Student Status</label><select id="studentStatus"><option>Active</option><option>Inactive</option><option>Graduated</option></select></div>
 </div>
-
-<div>
-<label>Class *</label>
-<select id="studentClass" required>
-<option value="">Select Class</option>
-<option>Play Group</option>
-<option>Nursery</option>
-<option>KG</option>
-<option>Class 1</option>
-<option>Class 2</option>
-<option>Class 3</option>
-<option>Class 4</option>
-<option>Class 5</option>
-<option>Class 6</option>
-<option>Class 7</option>
-<option>Class 8</option>
-<option>Class 9</option>
-<option>Class 10</option>
-<option>Class 11</option>
-<option>Class 12</option>
-</select>
-</div>
-
-<div>
-<label>Section</label>
-<select id="studentSection">
-<option value="">Select Section</option>
-<option>Primary</option>
-<option>Middle</option>
-<option>Secondary</option>
-<option>Higher Secondary</option>
-</select>
-</div>
-
-<div>
-<label>Roll Number</label>
-<input id="rollNumber" placeholder="Enter roll number">
-</div>
-
-<div>
-<label>Previous School</label>
-<input id="previousSchool" placeholder="Previous school name">
-</div>
-
-<div>
-<label>Student Status</label>
-<select id="studentStatus">
-<option value="Active">Active</option>
-<option value="Inactive">Inactive</option>
-<option value="Graduated">Graduated</option>
-</select>
-</div>
-
-</div>
-
 <h3 class="form-heading">3. Contact Information</h3>
-
 <div class="form-grid">
-
-<div>
-<label>Father / Guardian Phone *</label>
-<input id="studentPhone" type="tel" required placeholder="03XXXXXXXXX">
+<div><label>Father / Guardian Phone *</label><input id="studentPhone" type="tel" required placeholder="03XXXXXXXXX"></div>
+<div><label>Emergency Contact</label><input id="emergencyContact" type="tel" placeholder="Emergency phone"></div>
+<div style="grid-column:1/-1"><label>Home Address</label><input id="studentAddress" placeholder="Enter complete home address"></div>
 </div>
-
-<div>
-<label>Emergency Contact</label>
-<input id="emergencyContact" type="tel" placeholder="Emergency phone">
-</div>
-
-<div style="grid-column:1/-1">
-<label>Home Address</label>
-<input id="studentAddress" placeholder="Enter complete home address">
-</div>
-
-</div>
-
 <button class="btn" id="studentSubmitBtn" type="submit">Save Student Admission</button>
 <button class="btn btn-secondary" id="cancelEditBtn" type="button" onclick="cancelStudentEdit()" style="display:none">Cancel Edit</button>
-
 </form>
 </div>
-
 <div class="card">
 <h2>Students List</h2>
-
-<input class="search" id="studentSearch"
-placeholder="Search students..."
-oninput="searchStudents()">
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Admission No.</th>
-<th>Student Name</th>
-<th>Father Name</th>
-<th>Class</th>
-<th>Section</th>
-<th>Phone</th>
-<th>Status</th>
-<th>Action</th>
-</tr>
-</thead>
-<tbody id="studentTable"></tbody>
-</table>
+<input class="search" id="studentSearch" placeholder="Search students..." oninput="searchStudents()">
+<div class="table-wrap"><table><thead><tr><th>Admission No.</th><th>Student Name</th><th>Father Name</th><th>Class</th><th>Section</th><th>Phone</th><th>Status</th><th>Action</th></tr></thead><tbody id="studentTable"></tbody></table></div>
 </div>
-</div>
-
 </section>
 
-<!-- TEACHERS -->
 <section id="teachers" class="section">
-
 <div class="card">
 <h2 id="teacherFormTitle">Add Teacher</h2>
 <p><small>Complete the teacher profile. You can edit details and print the profile later.</small></p>
-
 <form id="teacherForm">
-
 <h3 class="form-heading">1. Teacher Information</h3>
-
 <div class="form-grid">
-
-<div>
-<label>Teacher ID</label>
-<input id="teacherId" readonly style="background:#f1f5f2;font-weight:bold;color:#087443">
+<div><label>Teacher ID</label><input id="teacherId" readonly style="background:#f1f5f2;font-weight:bold;color:#087443"></div>
+<div><label>Teacher Name *</label><input id="teacherName" required placeholder="Enter teacher name"></div>
+<div><label>Father Name *</label><input id="teacherFather" required placeholder="Enter father name"></div>
+<div><label>CNIC Number *</label><input id="teacherCnic" required placeholder="XXXXX-XXXXXXX-X" maxlength="15"></div>
+<div><label>Gender *</label><select id="teacherGender" required><option value="">Select Gender</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+<div><label>Qualification</label><input id="teacherQualification" placeholder="e.g. B.A, B.Ed, M.A"></div>
+<div><label>Employment Status *</label><select id="teacherStatus" required><option>Active</option><option>Inactive</option></select></div>
+<div><label>School ID *</label><input id="teacherSchoolId" required placeholder="Enter School ID manually"></div>
 </div>
-
-<div>
-<label>Teacher Name *</label>
-<input id="teacherName" required placeholder="Enter teacher name">
-</div>
-
-<div>
-<label>Father Name *</label>
-<input id="teacherFather" required placeholder="Enter father name">
-</div>
-
-<div>
-<label>CNIC Number *</label>
-<input id="teacherCnic" required placeholder="XXXXX-XXXXXXX-X" maxlength="15">
-</div>
-
-<div>
-<label>Gender *</label>
-<select id="teacherGender" required>
-<option value="">Select Gender</option>
-<option>Male</option>
-<option>Female</option>
-<option>Other</option>
-</select>
-</div>
-
-<div>
-<label>Qualification</label>
-<input id="teacherQualification" placeholder="e.g. B.A, B.Ed, M.A">
-</div>
-
-<div>
-<label>Employment Status *</label>
-<select id="teacherStatus" required>
-<option value="Active">Active</option>
-<option value="Inactive">Inactive</option>
-</select>
-</div>
-
-<div>
-<label>School ID *</label>
-<input id="teacherSchoolId" required placeholder="Enter School ID manually">
-</div>
-
-</div>
-
 <h3 class="form-heading">2. Contact Information</h3>
-
 <div class="form-grid">
-
-<div>
-<label>Mobile Number *</label>
-<input id="teacherMobile" type="tel" required placeholder="03XXXXXXXXX" maxlength="11">
+<div><label>Mobile Number *</label><input id="teacherMobile" type="tel" required placeholder="03XXXXXXXXX" maxlength="11"></div>
+<div><label>WhatsApp Number</label><input id="teacherWhatsapp" type="tel" placeholder="03XXXXXXXXX" maxlength="11"></div>
+<div><label>Email Address</label><input id="teacherEmail" type="email" placeholder="Enter email address"></div>
+<div><label>Address</label><input id="teacherAddress" placeholder="Enter complete address"></div>
 </div>
-
-<div>
-<label>WhatsApp Number</label>
-<input id="teacherWhatsapp" type="tel" placeholder="03XXXXXXXXX" maxlength="11">
-</div>
-
-<div>
-<label>Email Address</label>
-<input id="teacherEmail" type="email" placeholder="Enter email address">
-</div>
-
-<div>
-<label>Address</label>
-<input id="teacherAddress" placeholder="Enter complete address">
-</div>
-
-</div>
-
 <h3 class="form-heading">3. Subjects Taught (Maximum 8)</h3>
-
 <div id="teacherSubjects" class="subject-grid"></div>
-
 <button class="btn btn-secondary" type="button" id="addSubjectBtn" onclick="addTeacherSubject()">+ Add Subject</button>
-
 <h3 class="form-heading">4. Profile Picture</h3>
-
 <label>Upload Teacher Photo (Maximum 1 MB)</label>
 <input id="teacherPhoto" type="file" accept="image/*">
-
 <img id="teacherPhotoPreview" class="teacher-photo-preview" alt="Teacher photo preview" style="display:none">
-
 <button class="btn" id="teacherSubmitBtn" type="submit">Add Teacher</button>
 <button class="btn btn-secondary" id="cancelTeacherEditBtn" type="button" onclick="cancelTeacherEdit()" style="display:none">Cancel Edit</button>
-
 </form>
 </div>
-
 <div class="card">
 <h2>Teachers List</h2>
-
 <input class="search" id="teacherSearch" placeholder="Search teacher..." oninput="searchTeachers()">
-
-<div class="table-wrap">
-<table>
-<thead>
-<tr>
-<th>Photo</th>
-<th>Teacher ID</th>
-<th>Teacher Name</th>
-<th>CNIC</th>
-<th>Subjects</th>
-<th>School ID</th>
-<th>Status</th>
-<th>Actions</th>
-</tr>
-</thead>
-<tbody id="teacherTable"></tbody>
-</table>
+<div class="table-wrap"><table><thead><tr><th>Photo</th><th>Teacher ID</th><th>Teacher Name</th><th>CNIC</th><th>Subjects</th><th>School ID</th><th>Status</th><th>Actions</th></tr></thead><tbody id="teacherTable"></tbody></table></div>
 </div>
-</div>
-
 </section>
-
-<!-- OTHER SECTIONS -->
-<section id="attendance" class="section"><div class="card"><h2>Attendance</h2><p>Attendance module will be developed next.</p></div></section>
-<section id="fees" class="section"><div class="card"><h2>Fees Management</h2><p>Fees module will be developed next.</p></div></section>
-<section id="exams" class="section"><div class="card"><h2>Exams & Results</h2><p>Examination module will be developed next.</p></div></section>
-<section id="timetable" class="section"><div class="card"><h2>Timetable</h2><p>Timetable module will be developed next.</p></div></section>
-<section id="reports" class="section"><div class="card"><h2>Reports</h2><p>Reports module will be developed next.</p></div></section>
-<section id="settings" class="section"><div class="card"><h2>Settings</h2><p>School management settings.</p></div></section>
-
-</main>
-</div>
-
-<script>
-
-let editingStudentId = null;
-
-function showSection(id,button){
-document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
-document.getElementById(id).classList.add('active');
-if(button)button.classList.add('active');
-}
-
-function getSchoolName(id){
-const names={
-main:'Main School',
-branch1:'City Campus',
-branch2:'Model Campus'
-};
-return names[id]||id||'Main School';
-}
-
-function getSafe(value){
-return value==null?'':String(value);
-}
-
-/* STUDENTS */
-
-function renderStudents(){
-if(typeof getStudents!=='function')return;
-
-const students=getStudents()||[];
-const table=document.getElementById('studentTable');
-table.innerHTML='';
-
-students.forEach(s=>{
-const row=document.createElement('tr');
-
-[
-s.admissionNo,
-s.name,
-s.fatherName,
-s.class,
-s.section,
-s.phone,
-s.status
-].forEach(value=>{
-const td=document.createElement('td');
-td.textContent=getSafe(value)||'-';
-row.appendChild(td);
-});
-
-const actionCell=document.createElement('td');
-
-const editButton=document.createElement('button');
-editButton.type='button';
-editButton.className='btn-edit';
-editButton.textContent='Edit';
-editButton.onclick=()=>editStudent(s.id);
-
-actionCell.appendChild(editButton);
-row.appendChild(actionCell);
-
-table.appendChild(row);
-});
-
-document.getElementById('totalStudents').textContent=students.length;
-}
-
-function editStudent(id){
-const students=getStudents()||[];
-const student=students.find(s=>String(s.id)===String(id));
-
-if(!student){
-alert('Student record not found.');
-return;
-}
-
-editingStudentId=id;
-
-document.getElementById('admissionNo').value=getSafe(student.admissionNo);
-document.getElementById('studentName').value=getSafe(student.name);
-document.getElementById('fatherName').value=getSafe(student.fatherName);
-document.getElementById('dob').value=getSafe(student.dob);
-document.getElementById('gender').value=getSafe(student.gender);
-document.getElementById('admissionDate').value=getSafe(student.admissionDate);
-document.getElementById('studentSchool').value=getSafe(student.school)||'main';
-document.getElementById('studentClass').value=getSafe(student.class);
-document.getElementById('studentSection').value=getSafe(student.section);
-document.getElementById('rollNumber').value=getSafe(student.rollNumber);
-document.getElementById('previousSchool').value=getSafe(student.previousSchool);
-document.getElementById('studentStatus').value=getSafe(student.status)||'Active';
-document.getElementById('studentPhone').value=getSafe(student.phone);
-document.getElementById('emergencyContact').value=getSafe(student.emergencyContact);
-document.getElementById('studentAddress').value=getSafe(student.address);
-
-document.getElementById('studentFormTitle').textContent='Edit Student Information';
-document.getElementById('studentSubmitBtn').textContent='Update Student';
-document.getElementById('cancelEditBtn').style.display='inline-block';
-
-document.getElementById('studentForm').scrollIntoView({behavior:'smooth'});
-}
-
-function cancelStudentEdit(){
-editingStudentId=null;
-document.getElementById('studentForm').reset();
-document.getElementById('studentFormTitle').textContent='Student Admission Form';
-document.getElementById('studentSubmitBtn').textContent='Save Student Admission';
-document.getElementById('cancelEditBtn').style.display='none';
-}
-
-document.getElementById('studentForm').addEventListener('submit',function(e){
-e.preventDefault();
-
-if(typeof getStudents!=='function'){
-alert('Student functions not found in app.js');
-return;
-}
-
-const student={
-admissionNo:document.getElementById('admissionNo').value.trim(),
-name:document.getElementById('studentName').value.trim(),
-fatherName:document.getElementById('fatherName').value.trim(),
-dob:document.getElementById('dob').value,
-gender:document.getElementById('gender').value,
-admissionDate:document.getElementById('admissionDate').value,
-school:document.getElementById('studentSchool').value,
-class:document.getElementById('studentClass').value,
-section:document.getElementById('studentSection').value,
-rollNumber:document.getElementById('rollNumber').value.trim(),
-previousSchool:document.getElementById('previousSchool').value.trim(),
-status:document.getElementById('studentStatus').value,
-phone:document.getElementById('studentPhone').value.trim(),
-emergencyContact:document.getElementById('emergencyContact').value.trim(),
-address:document.getElementById('studentAddress').value.trim()
-};
-
-const students=getStudents()||[];
-
-const duplicate=students.some(s=>
-s.admissionNo &&
-s.admissionNo.toLowerCase()===student.admissionNo.toLowerCase() &&
-String(s.id)!==String(editingStudentId)
-);
-
-if(duplicate){
-alert('This admission number is already in use. Please enter another number.');
-return;
-}
-
-if(editingStudentId!==null){
-
-if(typeof updateStudent==='function'){
-updateStudent(editingStudentId,student);
-}else{
-const index=students.findIndex(s=>String(s.id)===String(editingStudentId));
-
-if(index===-1){
-alert('Student record not found.');
-return;
-}
-
-students[index]={...students[index],...student};
-localStorage.setItem('students',JSON.stringify(students));
-}
-
-alert('Student information updated successfully!');
-
-}else{
-
-if(typeof addStudent!=='function'){
-alert('addStudent function not found in app.js');
-return;
-}
-
-addStudent(student);
-alert('Student admission saved successfully!');
-}
-
-cancelStudentEdit();
-renderStudents();
-});
-
-function searchStudents(){
-const q=document.getElementById('studentSearch').value.toLowerCase();
-
-document.querySelectorAll('#studentTable tr').forEach(row=>{
-row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
-});
-}
-
-/* TEACHERS */
-
-let editingTeacherId = null;
-let currentTeacherPhoto = '';
-let teacherSubjectCount = 0;
-
-function getTeacherRecords(){
-return typeof getTeachers === 'function' ? (getTeachers() || []) : [];
-}
-
-function generateTeacherId(){
-const teachers=getTeacherRecords();
-let highest=teachers.length;
-
-teachers.forEach(t=>{
-const match=String(t.teacherId||'').match(/^TCH-(\d+)$/i);
-if(match)highest=Math.max(highest,Number(match[1]));
-});
-
-return 'TCH-'+String(highest+1).padStart(3,'0');
-}
-
-function addTeacherSubject(value=''){
-if(teacherSubjectCount>=8){
-alert('Maximum 8 subjects are allowed.');
-return;
-}
-
-teacherSubjectCount++;
-const number=teacherSubjectCount;
-
-const wrap=document.createElement('div');
-wrap.className='subject-item';
-
-const input=document.createElement('input');
-input.type='text';
-input.className='teacher-subject-input';
-input.placeholder='Subject '+number;
-input.value=value;
-input.setAttribute('aria-label','Subject '+number);
-
-const remove=document.createElement('button');
-remove.type='button';
-remove.className='subject-remove';
-remove.textContent='Remove';
-
-remove.onclick=()=>{
-wrap.remove();
-teacherSubjectCount=document.querySelectorAll('.teacher-subject-input').length;
-updateSubjectButton();
-};
-
-wrap.appendChild(input);
-wrap.appendChild(remove);
-
-document.getElementById('teacherSubjects').appendChild(wrap);
-updateSubjectButton();
-}
-
-function updateSubjectButton(){
-document.getElementById('addSubjectBtn').disabled=teacherSubjectCount>=8;
-document.getElementById('addSubjectBtn').style.opacity=teacherSubjectCount>=8?'.5':'1';
-}
-
-function resetTeacherSubjects(subjects=[]){
-document.getElementById('teacherSubjects').innerHTML='';
-teacherSubjectCount=0;
-
-const list=Array.isArray(subjects)&&subjects.length?subjects:[''];
-list.slice(0,8).forEach(subject=>addTeacherSubject(subject));
-}
-
-function resetTeacherForm(){
-editingTeacherId=null;
-currentTeacherPhoto='';
-
-document.getElementById('teacherForm').reset();
-document.getElementById('teacherId').value=generateTeacherId();
-document.getElementById('teacherFormTitle').textContent='Add Teacher';
-document.getElementById('teacherSubmitBtn').textContent='Add Teacher';
-document.getElementById('cancelTeacherEditBtn').style.display='none';
-
-document.getElementById('teacherPhotoPreview').src='';
-document.getElementById('teacherPhotoPreview').style.display='none';
-
-resetTeacherSubjects(['']);
-}
-
-function renderTeachers(){
-if(typeof getTeachers!=='function')return;
-
-const teachers=getTeacherRecords();
-const table=document.getElementById('teacherTable');
-table.innerHTML='';
-
-teachers.forEach(t=>{
-const row=document.createElement('tr');
-
-const photoCell=document.createElement('td');
-
-if(t.photo){
-const img=document.createElement('img');
-img.src=t.photo;
-img.className='teacher-thumb';
-img.alt='Teacher photo';
-photoCell.appendChild(img);
-}else{
-photoCell.textContent='-';
-}
-
-row.appendChild(photoCell);
-
-[
-getSafe(t.teacherId)||'-',
-getSafe(t.name)||'-',
-getSafe(t.cnic)||'-',
-(Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[])).join(', ')||'-',
-getSafe(t.schoolId)||getSafe(t.school)||'-',
-getSafe(t.status)||'Active'
-].forEach(value=>{
-const td=document.createElement('td');
-td.textContent=value;
-row.appendChild(td);
-});
-
-const actions=document.createElement('td');
-
-const edit=document.createElement('button');
-edit.type='button';
-edit.className='btn-edit';
-edit.textContent='Edit';
-edit.onclick=()=>editTeacher(t.id);
-actions.appendChild(edit);
-
-const view=document.createElement('button');
-view.type='button';
-view.className='btn-view';
-view.textContent='View / Print';
-view.onclick=()=>printTeacher(t.id);
-actions.appendChild(view);
-
-row.appendChild(actions);
-table.appendChild(row);
-});
-
-document.getElementById('totalTeachers').textContent=teachers.length;
-}
-
-function editTeacher(id){
-const teacher=getTeacherRecords().find(t=>String(t.id)===String(id));
-
-if(!teacher){
-alert('Teacher record not found.');
-return;
-}
-
-editingTeacherId=id;
-currentTeacherPhoto=teacher.photo||'';
-
-document.getElementById('teacherId').value=teacher.teacherId||generateTeacherId();
-document.getElementById('teacherName').value=getSafe(teacher.name);
-document.getElementById('teacherFather').value=getSafe(teacher.fatherName);
-document.getElementById('teacherCnic').value=getSafe(teacher.cnic);
-document.getElementById('teacherGender').value=getSafe(teacher.gender);
-document.getElementById('teacherQualification').value=getSafe(teacher.qualification);
-document.getElementById('teacherStatus').value=getSafe(teacher.status)||'Active';
-document.getElementById('teacherSchoolId').value=getSafe(teacher.schoolId)||getSafe(teacher.school);
-document.getElementById('teacherMobile').value=getSafe(teacher.mobile);
-document.getElementById('teacherWhatsapp').value=getSafe(teacher.whatsapp);
-document.getElementById('teacherEmail').value=getSafe(teacher.email);
-document.getElementById('teacherAddress').value=getSafe(teacher.address);
-
-resetTeacherSubjects(
-Array.isArray(teacher.subjects)?teacher.subjects:(teacher.subject?[teacher.subject]:[])
-);
-
-const preview=document.getElementById('teacherPhotoPreview');
-
-if(currentTeacherPhoto){
-preview.src=currentTeacherPhoto;
-preview.style.display='block';
-}else{
-preview.src='';
-preview.style.display='none';
-}
-
-document.getElementById('teacherFormTitle').textContent='Edit Teacher Information';
-document.getElementById('teacherSubmitBtn').textContent='Update Teacher';
-document.getElementById('cancelTeacherEditBtn').style.display='inline-block';
-
-document.getElementById('teacherForm').scrollIntoView({behavior:'smooth'});
-}
-
-function cancelTeacherEdit(){
-resetTeacherForm();
-}
-
-document.getElementById('teacherPhoto').addEventListener('change',function(){
-const file=this.files&&this.files[0];
-if(!file)return;
-
-if(!file.type.startsWith('image/')){
-alert('Please select a valid image file.');
-this.value='';
-return;
-}
-
-if(file.size>1024*1024){
-alert('Photo size must be 1 MB or less.');
-this.value='';
-return;
-}
-
-const reader=new FileReader();
-
-reader.onload=()=>{
-currentTeacherPhoto=reader.result;
-
-const preview=document.getElementById('teacherPhotoPreview');
-preview.src=currentTeacherPhoto;
-preview.style.display='block';
-};
-
-reader.readAsDataURL(file);
-});
-
-document.getElementById('teacherCnic').addEventListener('input',function(){
-const digits=this.value.replace(/\D/g,'').slice(0,13);
-
-let formatted=digits;
-
-if(digits.length>5){
-formatted=digits.slice(0,5)+'-'+digits.slice(5,12);
-}
-
-if(digits.length>12){
-formatted+='-'+digits.slice(12,13);
-}
-
-this.value=formatted;
-});
-
-document.getElementById('teacherForm').addEventListener('submit',function(e){
-e.preventDefault();
-
-if(typeof addTeacher!=='function'){
-alert('addTeacher function not found in js/app.js.');
-return;
-}
-
-const cnic=document.getElementById('teacherCnic').value.trim();
-
-if(!/^\d{5}-\d{7}-\d$/.test(cnic)){
-alert('Please enter CNIC in this format: 12345-1234567-1');
-return;
-}
-
-const teachers=getTeacherRecords();
-
-const duplicate=teachers.some(t=>
-String(t.cnic||'')===cnic &&
-String(t.id)!==String(editingTeacherId)
-);
-
-if(duplicate){
-alert('This CNIC number is already registered.');
-return;
-}
-
-const subjects=Array.from(
-document.querySelectorAll('.teacher-subject-input')
-).map(input=>input.value.trim()).filter(Boolean);
-
-if(subjects.length===0){
-alert('Please enter at least one subject.');
-return;
-}
-
-const teacher={
-teacherId:document.getElementById('teacherId').value.trim(),
-name:document.getElementById('teacherName').value.trim(),
-fatherName:document.getElementById('teacherFather').value.trim(),
-cnic:cnic,
-gender:document.getElementById('teacherGender').value,
-qualification:document.getElementById('teacherQualification').value.trim(),
-status:document.getElementById('teacherStatus').value,
-schoolId:document.getElementById('teacherSchoolId').value.trim(),
-mobile:document.getElementById('teacherMobile').value.trim(),
-whatsapp:document.getElementById('teacherWhatsapp').value.trim(),
-email:document.getElementById('teacherEmail').value.trim(),
-address:document.getElementById('teacherAddress').value.trim(),
-subjects:subjects,
-photo:currentTeacherPhoto
-};
-
-if(editingTeacherId!==null){
-
-const index=teachers.findIndex(t=>String(t.id)===String(editingTeacherId));
-
-if(index===-1){
-alert('Teacher record not found.');
-return;
-}
-
-if(typeof updateTeacher==='function'){
-updateTeacher(editingTeacherId,teacher);
-}else{
-teachers[index]={...teachers[index],...teacher};
-localStorage.setItem('teachers',JSON.stringify(teachers));
-}
-
-alert('Teacher information updated successfully!');
-
-}else{
-
-addTeacher(teacher);
-alert('Teacher added successfully!');
-}
-
-resetTeacherForm();
-renderTeachers();
-});
-
-function escapeHtml(value){
-return getSafe(value).replace(/[&<>"']/g,char=>({
-'&':'&amp;',
-'<':'&lt;',
-'>':'&gt;',
-'"':'&quot;',
-"'":'&#39;'
-}[char]));
-}
-
-function printTeacher(id){
-const t=getTeacherRecords().find(item=>String(item.id)===String(id));
-
-if(!t){
-alert('Teacher record not found.');
-return;
-}
-
-const subjects=Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[]);
-
-const photo=t.photo
-?'<img class="photo" src="'+t.photo+'" alt="Teacher Photo">'
-:'<div class="photo empty">No Photo</div>';
-
-const popup=window.open('','_blank','width=900,height=700');
-
-if(!popup){
-alert('Please allow pop-ups to print the teacher profile.');
-return;
-}
-
-popup.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<title>Teacher Profile - ${escapeHtml(t.name)}</title>
-<meta charset="UTF-8">
-
-<style>
-*{box-sizing:border-box}
-body{font-family:Arial,sans-serif;color:#222;margin:0;padding:28px}
-.page{max-width:800px;margin:auto;border:1px solid #ddd;padding:30px}
-.top{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #087443;padding-bottom:18px}
-.top h1{color:#087443;margin:0 0 6px}
-.photo{width:115px;height:130px;object-fit:cover;border:1px solid #bbb}
-.empty{display:flex;align-items:center;justify-content:center;color:#777;font-size:12px}
-.section-title{background:#edf7f1;color:#087443;padding:9px;margin:22px 0 10px;font-weight:bold}
-.details{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}
-.field{border-bottom:1px solid #eee;padding:7px 0}
-.field b{display:block;font-size:12px;color:#666;margin-bottom:4px}
-.subjects{line-height:1.8}
-.signatures{display:flex;justify-content:space-between;margin-top:85px}
-.signatures div{width:38%;border-top:1px solid #333;text-align:center;padding-top:8px}
-.footer{margin-top:30px;text-align:center;color:#777;font-size:11px}
-@media print{
-body{padding:0}
-.page{border:0;padding:15mm}
-}
-</style>
-</head>
-
-<body>
-
-<div class="page">
-
-<div class="top">
-<div>
-<h1>Teacher Profile</h1>
-<div>School Management System</div>
-<p><b>Teacher ID:</b> ${escapeHtml(t.teacherId||'-')}</p>
-</div>
-${photo}
-</div>
-
-<div class="section-title">Personal Information</div>
-
-<div class="details">
-<div class="field"><b>Teacher Name</b>${escapeHtml(t.name||'-')}</div>
-<div class="field"><b>Father Name</b>${escapeHtml(t.fatherName||'-')}</div>
-<div class="field"><b>CNIC Number</b>${escapeHtml(t.cnic||'-')}</div>
-<div class="field"><b>Gender</b>${escapeHtml(t.gender||'-')}</div>
-<div class="field"><b>Qualification</b>${escapeHtml(t.qualification||'-')}</div>
-<div class="field"><b>Employment Status</b>${escapeHtml(t.status||'Active')}</div>
-<div class="field"><b>School ID</b>${escapeHtml(t.schoolId||t.school||'-')}</div>
-</div>
-
-<div class="section-title">Contact Information</div>
-
-<div class="details">
-<div class="field"><b>Mobile Number</b>${escapeHtml(t.mobile||'-')}</div>
-<div class="field"><b>WhatsApp Number</b>${escapeHtml(t.whatsapp||'-')}</div>
-<div class="field"><b>Email Address</b>${escapeHtml(t.email||'-')}</div>
-<div class="field"><b>Address</b>${escapeHtml(t.address||'-')}</div>
-</div>
-
-<div class="section-title">Subjects Taught</div>
-
-<div class="subjects">
-${subjects.length?subjects.map(escapeHtml).join(' &nbsp; | &nbsp; '):'-'}
-</div>
-
-<div class="signatures">
-<div>Teacher Signature</div>
-<div>Principal Signature</div>
-</div>
-
-<div class="footer">Printed from School Management System</div>
-
-</div>
-
-<script>
-window.onload=function(){
-setTimeout(function(){window.print();},400);
-};
-<\/script>
-
-</body>
-</html>`);
-
-popup.document.close();
-}
-
-function searchTeachers(){
-const q=document.getElementById('teacherSearch').value.toLowerCase();
-
-document.querySelectorAll('#teacherTable tr').forEach(row=>{
-row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
-});
-}
-
-/* INITIAL LOAD */
-
-renderStudents();
-renderTeachers();
-resetTeacherForm();
-
-</script>
-
-</body>
-</html>
