@@ -29,12 +29,14 @@ label{font-weight:600;font-size:14px}
 .subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 15px}
 .btn{background:#087443;color:white;border:0;padding:12px 20px;border-radius:7px;cursor:pointer;font-weight:bold}
 .btn:hover{background:#065b35}
-table{width:100%;border-collapse:collapse;min-width:550px}
+.btn-secondary{background:#777;margin-left:7px}
+.btn-secondary:hover{background:#555}
+.btn-edit{background:#e9f7f0;color:#087443;padding:7px 12px;border:0;border-radius:5px;cursor:pointer;font-weight:bold}
+table{width:100%;border-collapse:collapse;min-width:650px}
 th,td{padding:12px;border-bottom:1px solid #eee;text-align:left;font-size:14px;vertical-align:top}
 th{background:#edf7f1;color:#087443}
 .table-wrap{overflow-x:auto}
 .search{max-width:350px}
-.mobile-menu{display:none}
 small{color:#777}
 .form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
 @media(max-width:700px){
@@ -96,8 +98,8 @@ small{color:#777}
 <section id="students" class="section">
 
 <div class="card">
-<h2>Student Admission Form</h2>
-<p><small>Complete student admission information.</small></p>
+<h2 id="studentFormTitle">Student Admission Form</h2>
+<p><small>Enter student information. Admission number can be entered manually.</small></p>
 
 <form id="studentForm">
 
@@ -107,7 +109,7 @@ small{color:#777}
 
 <div>
 <label>Admission Number</label>
-<input id="admissionNo" readonly>
+<input id="admissionNo" placeholder="Enter admission number">
 </div>
 
 <div>
@@ -118,11 +120,6 @@ small{color:#777}
 <div>
 <label>Father / Guardian Name *</label>
 <input id="fatherName" required placeholder="Enter father name">
-</div>
-
-<div>
-<label>Mother Name</label>
-<input id="motherName" placeholder="Enter mother name">
 </div>
 
 <div>
@@ -141,8 +138,8 @@ small{color:#777}
 </div>
 
 <div>
-<label>Admission Date *</label>
-<input id="admissionDate" type="date" required>
+<label>Admission Date (Optional)</label>
+<input id="admissionDate" type="date">
 </div>
 
 </div>
@@ -186,10 +183,10 @@ small{color:#777}
 <label>Section</label>
 <select id="studentSection">
 <option value="">Select Section</option>
-<option>A</option>
-<option>B</option>
-<option>C</option>
-<option>D</option>
+<option>Primary</option>
+<option>Middle</option>
+<option>Secondary</option>
+<option>Higher Secondary</option>
 </select>
 </div>
 
@@ -235,7 +232,8 @@ small{color:#777}
 
 </div>
 
-<button class="btn" type="submit">Save Student Admission</button>
+<button class="btn" id="studentSubmitBtn" type="submit">Save Student Admission</button>
+<button class="btn btn-secondary" id="cancelEditBtn" type="button" onclick="cancelStudentEdit()" style="display:none">Cancel Edit</button>
 
 </form>
 </div>
@@ -258,6 +256,7 @@ oninput="searchStudents()">
 <th>Section</th>
 <th>Phone</th>
 <th>Status</th>
+<th>Action</th>
 </tr>
 </thead>
 <tbody id="studentTable"></tbody>
@@ -342,11 +341,13 @@ oninput="searchStudents()">
 
 <script>
 
+let editingStudentId = null;
+
 function showSection(id,button){
 document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
 document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
 document.getElementById(id).classList.add('active');
-button.classList.add('active');
+if(button)button.classList.add('active');
 }
 
 function getSchoolName(id){
@@ -360,27 +361,6 @@ return names[id]||id||'Main School';
 
 function getSafe(value){
 return value==null?'':String(value);
-}
-
-/* STUDENT ADMISSION NUMBER */
-
-function generateAdmissionNo(){
-if(typeof getStudents!=='function')return 'STD-001';
-
-const students=getStudents()||[];
-let highest=0;
-
-students.forEach(student=>{
-const match=String(student.admissionNo||'').match(/^STD-(\d+)$/);
-if(match)highest=Math.max(highest,Number(match[1]));
-});
-
-return 'STD-'+String(highest+1).padStart(3,'0');
-}
-
-function setAdmissionDefaults(){
-document.getElementById('admissionNo').value=generateAdmissionNo();
-document.getElementById('admissionDate').value=new Date().toISOString().split('T')[0];
 }
 
 /* STUDENTS */
@@ -409,25 +389,75 @@ td.textContent=getSafe(value)||'-';
 row.appendChild(td);
 });
 
+const actionCell=document.createElement('td');
+const editButton=document.createElement('button');
+editButton.type='button';
+editButton.className='btn-edit';
+editButton.textContent='Edit';
+editButton.onclick=()=>editStudent(s.id);
+actionCell.appendChild(editButton);
+row.appendChild(actionCell);
+
 table.appendChild(row);
 });
 
 document.getElementById('totalStudents').textContent=students.length;
 }
 
+function editStudent(id){
+const students=getStudents()||[];
+const student=students.find(s=>String(s.id)===String(id));
+
+if(!student){
+alert('Student record not found.');
+return;
+}
+
+editingStudentId=id;
+
+document.getElementById('admissionNo').value=getSafe(student.admissionNo);
+document.getElementById('studentName').value=getSafe(student.name);
+document.getElementById('fatherName').value=getSafe(student.fatherName);
+document.getElementById('dob').value=getSafe(student.dob);
+document.getElementById('gender').value=getSafe(student.gender);
+document.getElementById('admissionDate').value=getSafe(student.admissionDate);
+document.getElementById('studentSchool').value=getSafe(student.school)||'main';
+document.getElementById('studentClass').value=getSafe(student.class);
+document.getElementById('studentSection').value=getSafe(student.section);
+document.getElementById('rollNumber').value=getSafe(student.rollNumber);
+document.getElementById('previousSchool').value=getSafe(student.previousSchool);
+document.getElementById('studentStatus').value=getSafe(student.status)||'Active';
+document.getElementById('studentPhone').value=getSafe(student.phone);
+document.getElementById('emergencyContact').value=getSafe(student.emergencyContact);
+document.getElementById('studentAddress').value=getSafe(student.address);
+
+document.getElementById('studentFormTitle').textContent='Edit Student Information';
+document.getElementById('studentSubmitBtn').textContent='Update Student';
+document.getElementById('cancelEditBtn').style.display='inline-block';
+
+document.getElementById('studentForm').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelStudentEdit(){
+editingStudentId=null;
+document.getElementById('studentForm').reset();
+document.getElementById('studentFormTitle').textContent='Student Admission Form';
+document.getElementById('studentSubmitBtn').textContent='Save Student Admission';
+document.getElementById('cancelEditBtn').style.display='none';
+}
+
 document.getElementById('studentForm').addEventListener('submit',function(e){
 e.preventDefault();
 
-if(typeof addStudent!=='function'){
-alert('Student function not found in app.js');
+if(typeof getStudents!=='function'){
+alert('Student functions not found in app.js');
 return;
 }
 
 const student={
-admissionNo:document.getElementById('admissionNo').value,
+admissionNo:document.getElementById('admissionNo').value.trim(),
 name:document.getElementById('studentName').value.trim(),
 fatherName:document.getElementById('fatherName').value.trim(),
-motherName:document.getElementById('motherName').value.trim(),
 dob:document.getElementById('dob').value,
 gender:document.getElementById('gender').value,
 admissionDate:document.getElementById('admissionDate').value,
@@ -444,17 +474,45 @@ address:document.getElementById('studentAddress').value.trim()
 
 const students=getStudents()||[];
 
-if(students.some(s=>s.admissionNo===student.admissionNo)){
-alert('Admission number already exists. Please refresh and try again.');
+const duplicate=students.some(s=>
+s.admissionNo &&
+s.admissionNo.toLowerCase()===student.admissionNo.toLowerCase() &&
+String(s.id)!==String(editingStudentId)
+);
+
+if(duplicate){
+alert('This admission number is already in use. Please enter another number.');
+return;
+}
+
+if(editingStudentId!==null){
+
+if(typeof updateStudent==='function'){
+updateStudent(editingStudentId,student);
+}else{
+const index=students.findIndex(s=>String(s.id)===String(editingStudentId));
+if(index===-1){
+alert('Student record not found.');
+return;
+}
+students[index]={...students[index],...student};
+localStorage.setItem('students',JSON.stringify(students));
+}
+
+alert('Student information updated successfully!');
+
+}else{
+
+if(typeof addStudent!=='function'){
+alert('addStudent function not found in app.js');
 return;
 }
 
 addStudent(student);
-
 alert('Student admission saved successfully!');
+}
 
-this.reset();
-setAdmissionDefaults();
+cancelStudentEdit();
 renderStudents();
 });
 
@@ -540,7 +598,6 @@ row.style.display=row.textContent.toLowerCase().includes(q)?'':'none';
 
 renderStudents();
 renderTeachers();
-setAdmissionDefaults();
 
 </script>
 
