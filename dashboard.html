@@ -344,7 +344,51 @@ small{color:#777}.form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
 </div>
 
 </section>
-<section id="exams" class="section"><div class="card"><h2>Exams & Results</h2><p>Examination module will be developed next.</p></div></section>
+<section id="exams" class="section">
+<div class="card">
+<h2>Create Examination</h2>
+<p><small>Create an exam for a class and section, then enter subject-wise total marks.</small></p>
+<form id="examForm">
+<div class="form-grid">
+<div><label>Exam Name *</label><input id="examName" required placeholder="e.g. First Term Examination"></div>
+<div><label>Class *</label><select id="examClass" required><option value="">Select Class</option><option>Play Group</option><option>Nursery</option><option>KG</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option></select></div>
+<div><label>Section *</label><select id="examSection" required><option value="">Select Section</option><option>Primary</option><option>Middle</option><option>Secondary</option><option>Higher Secondary</option></select></div>
+<div><label>School / Campus</label><select id="examSchool"><option value="all">All Schools</option><option value="main">Main School</option><option value="branch1">City Campus</option><option value="branch2">Model Campus</option></select></div>
+<div><label>Exam Date *</label><input id="examDate" type="date" required></div>
+</div>
+<h3 class="form-heading">Subjects & Total Marks</h3>
+<div id="examSubjects"></div>
+<div class="attendance-actions no-print"><button class="btn btn-secondary btn-small" type="button" onclick="addExamSubject()">+ Add Subject</button><button class="btn btn-small" type="submit">Save Examination</button><button class="btn btn-secondary btn-small" type="button" onclick="resetExamForm()">Clear Form</button></div>
+</form>
+</div>
+<div class="card">
+<h2>Examination List</h2>
+<div class="table-wrap"><table><thead><tr><th>Exam Name</th><th>Class</th><th>Section</th><th>Campus</th><th>Date</th><th>Subjects</th><th>Actions</th></tr></thead><tbody id="examListTable"></tbody></table></div>
+</div>
+<div class="card">
+<h2>Marks Entry</h2>
+<div class="form-grid no-print">
+<div><label>Select Examination</label><select id="marksExamSelect"><option value="">Select Examination</option></select></div>
+<div style="display:flex;align-items:end"><button class="btn btn-small" type="button" onclick="loadExamStudents()">Load Students</button></div>
+</div>
+<p id="marksMessage"><small>Select an examination and load its active students.</small></p>
+<div class="table-wrap"><table><thead id="marksEntryHead"></thead><tbody id="marksEntryTable"><tr><td>Select an examination first.</td></tr></tbody></table></div>
+<div class="attendance-actions no-print"><button class="btn" type="button" onclick="saveExamMarks()">Save All Marks</button></div>
+</div>
+<div class="card">
+<h2>Results & Merit List</h2>
+<div class="form-grid no-print">
+<div><label>Select Examination</label><select id="resultExamSelect"><option value="">Select Examination</option></select></div>
+<div class="attendance-actions" style="align-items:end"><button class="btn btn-small" type="button" onclick="renderExamResults()">Show Results</button><button class="btn btn-secondary btn-small" type="button" onclick="printExamMeritList()">Print Class Result</button></div>
+</div>
+<p id="resultMessage"><small>Select an examination to view saved results.</small></p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Admission No.</th><th>Student Name</th><th>Obtained</th><th>Total</th><th>Percentage</th><th>Grade</th><th>Result</th><th class="no-print">Action</th></tr></thead><tbody id="resultTable"></tbody></table></div>
+</div>
+<div class="card">
+<h3>Grading Criteria</h3>
+<div class="table-wrap"><table style="min-width:400px"><thead><tr><th>Percentage</th><th>Grade</th><th>Status</th></tr></thead><tbody><tr><td>80% and above</td><td>A+</td><td>Pass</td></tr><tr><td>70% – 79.99%</td><td>A</td><td>Pass</td></tr><tr><td>60% – 69.99%</td><td>B</td><td>Pass</td></tr><tr><td>50% – 59.99%</td><td>C</td><td>Pass</td></tr><tr><td>40% – 49.99%</td><td>D</td><td>Pass</td></tr><tr><td>Below 40%</td><td>F</td><td>Fail</td></tr></tbody></table></div>
+</div>
+</section>
 <section id="timetable" class="section"><div class="card"><h2>Timetable</h2><p>Timetable module will be developed next.</p></div></section>
 <section id="reports" class="section"><div class="card"><h2>Reports</h2><p>Reports module will be developed next.</p></div></section>
 <section id="settings" class="section"><div class="card"><h2>Settings</h2><p>School management settings.</p></div></section>
@@ -411,12 +455,8 @@ const duplicate=students.some(s=>s.admissionNo&&s.admissionNo.toLowerCase()===st
 if(duplicate)return alert('This admission number is already in use.');
 if(editingStudentId!==null){
 if(typeof updateStudent==='function')updateStudent(editingStudentId,student);
-else{
-const i=students.findIndex(s=>String(s.id)===String(editingStudentId));
-if(i<0)return alert('Student record not found.');
-students[i]={...students[i],...student};localStorage.setItem('students',JSON.stringify(students));
-}
-alert('Student information updated successfully!');
+else{const i=students.findIndex(s=>String(s.id)===String(editingStudentId));if(i<0)return alert('Student not found.');students[i]={...students[i],...student};localStorage.setItem('students',JSON.stringify(students));}
+alert('Student information updated successfully.');
 }else{
 if(typeof addStudent!=='function')return alert('addStudent function not found in app.js');
 addStudent(student);alert('Student admission saved successfully!');
@@ -432,8 +472,8 @@ document.querySelectorAll('#studentTable tr').forEach(r=>r.style.display=r.textC
 let editingTeacherId=null,currentTeacherPhoto='',teacherSubjectCount=0;
 function getTeacherRecords(){return typeof getTeachers==='function'?(getTeachers()||[]):[]}
 function generateTeacherId(){
-let highest=getTeacherRecords().length;
-getTeacherRecords().forEach(t=>{const m=String(t.teacherId||'').match(/^TCH-(\d+)$/i);if(m)highest=Math.max(highest,Number(m[1]))});
+const list=getTeacherRecords();let highest=0;
+list.forEach(t=>{const m=String(t.teacherId||'').match(/^TCH-(\d+)$/i);if(m)highest=Math.max(highest,Number(m[1]))});
 return 'TCH-'+String(highest+1).padStart(3,'0');
 }
 function addTeacherSubject(value=''){
@@ -442,98 +482,71 @@ teacherSubjectCount++;
 const wrap=document.createElement('div');wrap.className='subject-item';
 const input=document.createElement('input');input.type='text';input.className='teacher-subject-input';input.placeholder='Subject '+teacherSubjectCount;input.value=value;
 const remove=document.createElement('button');remove.type='button';remove.className='subject-remove';remove.textContent='Remove';
-remove.onclick=()=>{wrap.remove();teacherSubjectCount=document.querySelectorAll('.teacher-subject-input').length;updateSubjectButton()};
-wrap.append(input,remove);teacherSubjects.appendChild(wrap);updateSubjectButton();
+remove.onclick=()=>{wrap.remove();teacherSubjectCount=document.querySelectorAll('.teacher-subject-input').length;};
+wrap.append(input,remove);teacherSubjects.appendChild(wrap);
 }
-function updateSubjectButton(){addSubjectBtn.disabled=teacherSubjectCount>=8;addSubjectBtn.style.opacity=teacherSubjectCount>=8?'.5':'1'}
 function resetTeacherSubjects(subjects=[]){
 teacherSubjects.innerHTML='';teacherSubjectCount=0;
-(subjects.length?subjects:['']).slice(0,8).forEach(s=>addTeacherSubject(s));
+(subjects.length?subjects:['']).slice(0,8).forEach(x=>addTeacherSubject(x));
 }
 function resetTeacherForm(){
 editingTeacherId=null;currentTeacherPhoto='';teacherForm.reset();teacherId.value=generateTeacherId();
-teacherFormTitle.textContent='Add Teacher';teacherSubmitBtn.textContent='Add Teacher';
-cancelTeacherEditBtn.style.display='none';teacherPhotoPreview.src='';teacherPhotoPreview.style.display='none';
-resetTeacherSubjects(['']);
+teacherFormTitle.textContent='Add Teacher';teacherSubmitBtn.textContent='Add Teacher';cancelTeacherEditBtn.style.display='none';
+teacherPhotoPreview.src='';teacherPhotoPreview.style.display='none';resetTeacherSubjects(['']);
 }
 function renderTeachers(){
-if(typeof getTeachers!=='function')return;
-const table=document.getElementById('teacherTable');table.innerHTML='';
+const body=teacherTable;body.innerHTML='';
 getTeacherRecords().forEach(t=>{
-const row=document.createElement('tr'),photoCell=document.createElement('td');
-if(t.photo){const img=document.createElement('img');img.src=t.photo;img.className='teacher-thumb';img.alt='Teacher photo';photoCell.appendChild(img)}else photoCell.textContent='-';
-row.appendChild(photoCell);
-[getSafe(t.teacherId)||'-',getSafe(t.name)||'-',getSafe(t.cnic)||'-',(Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[])).join(', ')||'-',getSafe(t.schoolId)||getSafe(t.school)||'-',getSafe(t.status)||'Active'].forEach(v=>{const td=document.createElement('td');td.textContent=v;row.appendChild(td)});
+const row=document.createElement('tr'),photo=document.createElement('td');
+if(t.photo){const img=document.createElement('img');img.src=t.photo;img.className='teacher-thumb';photo.appendChild(img)}else photo.textContent='-';
+row.appendChild(photo);
+[getSafe(t.teacherId)||'-',getSafe(t.name)||'-',getSafe(t.cnic)||'-',(t.subjects||[]).join(', ')||'-',getSafe(t.schoolId)||'-',getSafe(t.status)||'Active'].forEach(v=>{const td=document.createElement('td');td.textContent=v;row.appendChild(td)});
 const actions=document.createElement('td'),edit=document.createElement('button'),view=document.createElement('button');
 edit.type='button';edit.className='btn-edit';edit.textContent='Edit';edit.onclick=()=>editTeacher(t.id);
 view.type='button';view.className='btn-view';view.textContent='View / Print';view.onclick=()=>printTeacher(t.id);
-actions.append(edit,view);row.appendChild(actions);table.appendChild(row);
+actions.append(edit,view);row.appendChild(actions);body.appendChild(row);
 });
 totalTeachers.textContent=getTeacherRecords().length;
 }
 function editTeacher(id){
-const t=getTeacherRecords().find(x=>String(x.id)===String(id));
-if(!t)return alert('Teacher record not found.');
+const t=getTeacherRecords().find(x=>String(x.id)===String(id));if(!t)return alert('Teacher record not found.');
 editingTeacherId=id;currentTeacherPhoto=t.photo||'';
-const fields={teacherId:t.teacherId||generateTeacherId(),teacherName:t.name,teacherFather:t.fatherName,teacherCnic:t.cnic,teacherGender:t.gender,teacherQualification:t.qualification,teacherStatus:t.status||'Active',teacherSchoolId:t.schoolId||t.school,teacherMobile:t.mobile,teacherWhatsapp:t.whatsapp,teacherEmail:t.email,teacherAddress:t.address};
+const fields={teacherId:t.teacherId,teacherName:t.name,teacherFather:t.fatherName,teacherCnic:t.cnic,teacherGender:t.gender,teacherQualification:t.qualification,teacherStatus:t.status||'Active',teacherSchoolId:t.schoolId,teacherMobile:t.mobile,teacherWhatsapp:t.whatsapp,teacherEmail:t.email,teacherAddress:t.address};
 Object.keys(fields).forEach(k=>document.getElementById(k).value=getSafe(fields[k]));
-resetTeacherSubjects(Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[]));
-if(currentTeacherPhoto){teacherPhotoPreview.src=currentTeacherPhoto;teacherPhotoPreview.style.display='block'}else{teacherPhotoPreview.src='';teacherPhotoPreview.style.display='none'}
-teacherFormTitle.textContent='Edit Teacher Information';teacherSubmitBtn.textContent='Update Teacher';
-cancelTeacherEditBtn.style.display='inline-block';teacherForm.scrollIntoView({behavior:'smooth'});
+resetTeacherSubjects(t.subjects||[]);
+if(currentTeacherPhoto){teacherPhotoPreview.src=currentTeacherPhoto;teacherPhotoPreview.style.display='block'}
+teacherFormTitle.textContent='Edit Teacher Information';teacherSubmitBtn.textContent='Update Teacher';cancelTeacherEditBtn.style.display='inline-block';
+teacherForm.scrollIntoView({behavior:'smooth'});
 }
 function cancelTeacherEdit(){resetTeacherForm()}
-
 teacherPhoto.addEventListener('change',function(){
 const file=this.files&&this.files[0];if(!file)return;
 if(!file.type.startsWith('image/')){alert('Please select a valid image.');this.value='';return}
-if(file.size>1024*1024){alert('Photo size must be 1 MB or less.');this.value='';return}
-const reader=new FileReader();
-reader.onload=()=>{currentTeacherPhoto=reader.result;teacherPhotoPreview.src=currentTeacherPhoto;teacherPhotoPreview.style.display='block'};
-reader.readAsDataURL(file);
+if(file.size>1024*1024){alert('Photo must be 1 MB or less.');this.value='';return}
+const reader=new FileReader();reader.onload=()=>{currentTeacherPhoto=reader.result;teacherPhotoPreview.src=currentTeacherPhoto;teacherPhotoPreview.style.display='block'};reader.readAsDataURL(file);
 });
 teacherCnic.addEventListener('input',function(){
 const d=this.value.replace(/\D/g,'').slice(0,13);
 this.value=d.length>12?d.slice(0,5)+'-'+d.slice(5,12)+'-'+d.slice(12):d.length>5?d.slice(0,5)+'-'+d.slice(5):d;
 });
 teacherForm.addEventListener('submit',e=>{
-e.preventDefault();
-if(typeof addTeacher!=='function')return alert('addTeacher function not found in js/app.js.');
-const cnic=teacherCnic.value.trim();
-if(!/^\d{5}-\d{7}-\d$/.test(cnic))return alert('Enter CNIC like 12345-1234567-1');
-const teachers=getTeacherRecords();
-if(teachers.some(t=>String(t.cnic||'')===cnic&&String(t.id)!==String(editingTeacherId)))return alert('This CNIC is already registered.');
+e.preventDefault();if(typeof addTeacher!=='function')return alert('addTeacher function not found in app.js.');
+const cnic=teacherCnic.value.trim();if(!/^\d{5}-\d{7}-\d$/.test(cnic))return alert('Enter CNIC as 12345-1234567-1.');
+const list=getTeacherRecords();if(list.some(t=>t.cnic===cnic&&String(t.id)!==String(editingTeacherId)))return alert('This CNIC is already registered.');
 const subjects=Array.from(document.querySelectorAll('.teacher-subject-input')).map(x=>x.value.trim()).filter(Boolean);
 if(!subjects.length)return alert('Please enter at least one subject.');
-const t={
-teacherId:teacherId.value.trim(),name:teacherName.value.trim(),fatherName:teacherFather.value.trim(),
-cnic,gender:teacherGender.value,qualification:teacherQualification.value.trim(),status:teacherStatus.value,
-schoolId:teacherSchoolId.value.trim(),mobile:teacherMobile.value.trim(),whatsapp:teacherWhatsapp.value.trim(),
-email:teacherEmail.value.trim(),address:teacherAddress.value.trim(),subjects,photo:currentTeacherPhoto
-};
-if(editingTeacherId!==null){
-const i=teachers.findIndex(x=>String(x.id)===String(editingTeacherId));
-if(i<0)return alert('Teacher record not found.');
-if(typeof updateTeacher==='function')updateTeacher(editingTeacherId,t);
-else{teachers[i]={...teachers[i],...t};localStorage.setItem('teachers',JSON.stringify(teachers))}
-alert('Teacher information updated successfully!');
-}else{addTeacher(t);alert('Teacher added successfully!')}
+const t={teacherId:teacherId.value.trim(),name:teacherName.value.trim(),fatherName:teacherFather.value.trim(),cnic,gender:teacherGender.value,qualification:teacherQualification.value.trim(),status:teacherStatus.value,schoolId:teacherSchoolId.value.trim(),mobile:teacherMobile.value.trim(),whatsapp:teacherWhatsapp.value.trim(),email:teacherEmail.value.trim(),address:teacherAddress.value.trim(),subjects,photo:currentTeacherPhoto};
+if(editingTeacherId!==null){const i=list.findIndex(x=>String(x.id)===String(editingTeacherId));if(i<0)return alert('Teacher record not found.');if(typeof updateTeacher==='function')updateTeacher(editingTeacherId,t);else{list[i]={...list[i],...t};localStorage.setItem('teachers',JSON.stringify(list))}alert('Teacher information updated successfully!')}
+else{addTeacher(t);alert('Teacher added successfully!')}
 resetTeacherForm();renderTeachers();
 });
-function escapeHtml(v){
-return getSafe(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
+function escapeHtml(v){return getSafe(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function printTeacher(id){
-const t=getTeacherRecords().find(x=>String(x.id)===String(id));
-if(!t)return alert('Teacher record not found.');
-const subjects=Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[]);
-const photo=t.photo?'<img class="photo" src="'+t.photo+'">':'<div class="photo empty">No Photo</div>';
-const popup=window.open('','_blank','width=900,height=700');
-if(!popup)return alert('Please allow pop-ups to print teacher profile.');
-popup.document.write(`<!DOCTYPE html><html><head><title>Teacher Profile - ${escapeHtml(t.name)}</title><meta charset="UTF-8">
-<style>
-*{box-sizing:border-box}body{font-family:Arial;color:#222;margin:0;padding:28px}
-.page{max-width:800px;margin:auto;border:1px solid #ddd;padding:30px}
+const t=getTeacherRecords().find(x=>String(x.id)===String(id));if(!t)return alert('Teacher record not found.');
+const subjects=t.subjects||[],photo=t.photo?'<img class="photo" src="'+t.photo+'">':'<div class="photo empty">No Photo</div>';
+const w=window.open('','_blank','width=900,height=700');if(!w)return alert('Please allow pop-ups to print teacher profile.');
+w.document.write(`<!DOCTYPE html><html><head><title>Teacher Profile - ${escapeHtml(t.name)}</title><meta charset="UTF-8"><style>
+*{box-sizing:border-box}body{font-family:Arial;color:#222;margin:0;padding:28px}.page{max-width:800px;margin:auto;border:1px solid #ddd;padding:30px}
 .top{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #087443;padding-bottom:18px}
 .top h1{color:#087443;margin:0 0 6px}.photo{width:115px;height:130px;object-fit:cover;border:1px solid #bbb}
 .empty{display:flex;align-items:center;justify-content:center;color:#777;font-size:12px}
@@ -553,7 +566,7 @@ popup.document.write(`<!DOCTYPE html><html><head><title>Teacher Profile - ${esca
 <div class="field"><b>Gender</b>${escapeHtml(t.gender||'-')}</div>
 <div class="field"><b>Qualification</b>${escapeHtml(t.qualification||'-')}</div>
 <div class="field"><b>Employment Status</b>${escapeHtml(t.status||'Active')}</div>
-<div class="field"><b>School ID</b>${escapeHtml(t.schoolId||t.school||'-')}</div></div>
+<div class="field"><b>School ID</b>${escapeHtml(t.schoolId||'-')}</div></div>
 <div class="section-title">Contact Information</div><div class="details">
 <div class="field"><b>Mobile Number</b>${escapeHtml(t.mobile||'-')}</div>
 <div class="field"><b>WhatsApp Number</b>${escapeHtml(t.whatsapp||'-')}</div>
@@ -564,93 +577,168 @@ popup.document.write(`<!DOCTYPE html><html><head><title>Teacher Profile - ${esca
 <div class="footer">Printed from School Management System</div></div>
 <script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script>
 </body></html>`);
-popup.document.close();
+w.document.close();
 }
 function searchTeachers(){
 const q=teacherSearch.value.toLowerCase();
 document.querySelectorAll('#teacherTable tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
 }
-
 /* OTHER STAFF */
 let editingStaffId=null;
-function getStaffRecords(){try{return JSON.parse(localStorage.getItem('schoolStaff')||'[]')}catch(e){return []}}
-function saveStaffRecords(a){localStorage.setItem('schoolStaff',JSON.stringify(a))}
+function getStaffRecords(){
+try{return JSON.parse(localStorage.getItem('schoolStaff')||'[]')}
+catch(e){return []}
+}
+function saveStaffRecords(list){
+localStorage.setItem('schoolStaff',JSON.stringify(list));
+}
 function generateStaffId(){
-const max=getStaffRecords().reduce((m,x)=>Math.max(m,parseInt(String(x.staffId||'').replace(/\D/g,''))||0),0);
+const list=getStaffRecords();
+const max=list.reduce((m,x)=>Math.max(m,parseInt(String(x.staffId||'').replace(/\D/g,''))||0),0);
 return 'STF-'+String(max+1).padStart(3,'0');
 }
 function resetStaffForm(){
-editingStaffId=null;staffForm.reset();staffFormTitle.textContent='Add Other Staff';
-staffSubmitBtn.textContent='Save Staff';cancelStaffEdit.style.display='none';
+editingStaffId=null;
+staffForm.reset();
+staffFormTitle.textContent='Add Other Staff';
+staffSubmitBtn.textContent='Save Staff';
+cancelStaffEdit.style.display='none';
 }
 function renderStaff(){
-const body=document.getElementById('staffTable');body.innerHTML='';
+const body=staffTable;
+body.innerHTML='';
 getStaffRecords().forEach(x=>{
 const row=document.createElement('tr');
 [x.staffId,x.name,x.category,x.mobile,x.schoolId,x.status].forEach(v=>{
-const td=document.createElement('td');td.textContent=v||'-';row.appendChild(td);
+const td=document.createElement('td');
+td.textContent=v||'-';
+row.appendChild(td);
 });
-const cell=document.createElement('td'),btn=document.createElement('button');
-btn.className='btn-edit';btn.textContent='Edit';btn.onclick=()=>editStaff(x.id);
-cell.appendChild(btn);row.appendChild(cell);body.appendChild(row);
+const cell=document.createElement('td');
+const btn=document.createElement('button');
+btn.className='btn-edit';
+btn.textContent='Edit';
+btn.onclick=()=>editStaff(x.id);
+cell.appendChild(btn);
+row.appendChild(cell);
+body.appendChild(row);
 });
 }
 function editStaff(id){
 const x=getStaffRecords().find(a=>String(a.id)===String(id));
-if(!x)return;
+if(!x)return alert('Staff record not found.');
 editingStaffId=id;
-const fields={staffName:x.name,staffFather:x.fatherName,staffCategory:x.category,staffCnic:x.cnic,staffMobile:x.mobile,staffEmail:x.email,staffSchoolId:x.schoolId,staffStatus:x.status||'Active',staffAddress:x.address};
+const fields={
+staffName:x.name,
+staffFather:x.fatherName,
+staffCategory:x.category,
+staffCnic:x.cnic,
+staffMobile:x.mobile,
+staffEmail:x.email,
+staffSchoolId:x.schoolId,
+staffStatus:x.status||'Active',
+staffAddress:x.address
+};
 Object.keys(fields).forEach(k=>document.getElementById(k).value=getSafe(fields[k]));
-staffFormTitle.textContent='Edit Staff';staffSubmitBtn.textContent='Update Staff';
+staffFormTitle.textContent='Edit Staff';
+staffSubmitBtn.textContent='Update Staff';
 cancelStaffEdit.style.display='inline-block';
 }
 function searchStaff(){
 const q=staffSearch.value.toLowerCase();
-document.querySelectorAll('#staffTable tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
+document.querySelectorAll('#staffTable tr').forEach(r=>{
+r.style.display=r.textContent.toLowerCase().includes(q)?'':'none';
+});
 }
 staffForm.addEventListener('submit',e=>{
 e.preventDefault();
 const a=getStaffRecords();
 const old=a.find(x=>String(x.id)===String(editingStaffId));
 const d={
-staffId:old?old.staffId:generateStaffId(),name:staffName.value.trim(),
-fatherName:staffFather.value.trim(),category:staffCategory.value,cnic:staffCnic.value.trim(),
-mobile:staffMobile.value.trim(),email:staffEmail.value.trim(),schoolId:staffSchoolId.value.trim(),
-status:staffStatus.value,address:staffAddress.value.trim()
+staffId:old?old.staffId:generateStaffId(),
+name:staffName.value.trim(),
+fatherName:staffFather.value.trim(),
+category:staffCategory.value,
+cnic:staffCnic.value.trim(),
+mobile:staffMobile.value.trim(),
+email:staffEmail.value.trim(),
+schoolId:staffSchoolId.value.trim(),
+status:staffStatus.value,
+address:staffAddress.value.trim()
 };
+if(d.cnic&&!/^\d{5}-\d{7}-\d$/.test(d.cnic))return alert('Enter CNIC in format 12345-1234567-1.');
+if(d.cnic&&a.some(x=>x.cnic===d.cnic&&String(x.id)!==String(editingStaffId)))return alert('This CNIC is already registered.');
 if(editingStaffId){
 const i=a.findIndex(x=>String(x.id)===String(editingStaffId));
 if(i<0)return alert('Staff not found.');
 a[i]={...a[i],...d};
-}else{d.id='STAFF-'+Date.now();a.push(d)}
-saveStaffRecords(a);resetStaffForm();renderStaff();alert('Staff saved successfully!');
+}else{
+d.id='STAFF-'+Date.now();
+a.push(d);
+}
+saveStaffRecords(a);
+resetStaffForm();
+renderStaff();
+alert('Staff saved successfully!');
 });
 
 /* ATTENDANCE */
 const ATTENDANCE_KEY='schoolAttendance';
 let attendanceRoster=[];
-function getAttendanceRecords(){try{return JSON.parse(localStorage.getItem(ATTENDANCE_KEY)||'[]')}catch(e){return []}}
-function setAttendanceRecords(a){localStorage.setItem(ATTENDANCE_KEY,JSON.stringify(a))}
+function getAttendanceRecords(){
+try{return JSON.parse(localStorage.getItem(ATTENDANCE_KEY)||'[]')}
+catch(e){return []}
+}
+function setAttendanceRecords(list){
+localStorage.setItem(ATTENDANCE_KEY,JSON.stringify(list));
+}
 function todayISO(){
 const d=new Date();
 return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
 }
 function attendanceFilter(){
-return {date:attendanceDate.value,school:attendanceSchool.value,category:attendanceCategory.value,className:attendanceClass.value,section:attendanceSection.value};
+return {
+date:attendanceDate.value,
+school:attendanceSchool.value,
+category:attendanceCategory.value,
+className:attendanceClass.value,
+section:attendanceSection.value
+};
 }
 function toggleStudentFilters(){
-const isStudent=attendanceCategory.value==='Students';
-attendanceClassWrap.style.display=isStudent?'block':'none';
-attendanceSectionWrap.style.display=isStudent?'block':'none';
+const yes=attendanceCategory.value==='Students';
+attendanceClassWrap.style.display=yes?'block':'none';
+attendanceSectionWrap.style.display=yes?'block':'none';
 }
 function getRosterForFilter(f){
 let list=[];
 if(f.category==='Students'){
-list=(typeof getStudents==='function'?getStudents():[]).filter(x=>(x.status||'Active')==='Active'&&(x.school||'main')===f.school&&(!f.className||x.class===f.className)&&(!f.section||x.section===f.section)).map(x=>({id:String(x.id),code:x.admissionNo||x.id,name:x.name||'',group:[x.class,x.section].filter(Boolean).join(' / ')}));
+list=(typeof getStudents==='function'?getStudents():[])
+.filter(x=>(x.status||'Active')==='Active'&&(x.school||'main')===f.school&&(!f.className||x.class===f.className)&&(!f.section||x.section===f.section))
+.map(x=>({
+id:String(x.id),
+code:x.admissionNo||x.id,
+name:x.name||'',
+group:[x.class,x.section].filter(Boolean).join(' / ')
+}));
 }else if(f.category==='Teachers'){
-list=getTeacherRecords().filter(x=>(x.status||'Active')==='Active'&&(x.schoolId===f.school||x.school===f.school||(!x.schoolId&&!x.school))).map(x=>({id:String(x.id),code:x.teacherId||x.id,name:x.name||'',group:'Teacher'}));
+list=getTeacherRecords()
+.filter(x=>(x.status||'Active')==='Active'&&(x.schoolId===f.school||x.school===f.school||(!x.schoolId&&!x.school)))
+.map(x=>({
+id:String(x.id),
+code:x.teacherId||x.id,
+name:x.name||'',
+group:'Teacher'
+}));
 }else{
-list=getStaffRecords().filter(x=>(x.status||'Active')==='Active'&&(x.schoolId===f.school||!x.schoolId)).map(x=>({id:String(x.id),code:x.staffId||x.id,name:x.name||'',group:x.category||'Other Staff'}));
+list=getStaffRecords()
+.filter(x=>(x.status||'Active')==='Active'&&(x.schoolId===f.school||!x.schoolId))
+.map(x=>({
+id:String(x.id),
+code:x.staffId||x.id,
+name:x.name||'',
+group:x.category||'Other Staff'
+}));
 }
 return list;
 }
@@ -658,34 +746,63 @@ function loadAttendanceRoster(){
 const f=attendanceFilter();
 if(!f.date)return alert('Select date.');
 attendanceRoster=getRosterForFilter(f);
-const old=getAttendanceRecords().find(x=>x.date===f.date&&x.school===f.school&&x.category===f.category&&x.className===f.className&&x.section===f.section);
-attendanceRoster=attendanceRoster.map(p=>({...p,status:old?((old.records.find(r=>String(r.personId)===p.id)||{}).status||'Present'):'Present'}));
-renderAttendanceTable();updateDailySummary();
+const old=getAttendanceRecords().find(x=>
+x.date===f.date&&x.school===f.school&&x.category===f.category&&
+x.className===f.className&&x.section===f.section
+);
+attendanceRoster=attendanceRoster.map(p=>({
+...p,
+status:old?((old.records.find(r=>String(r.personId)===p.id)||{}).status||'Present'):'Present'
+}));
+renderAttendanceTable();
+updateDailySummary();
 attendanceMessage.textContent=attendanceRoster.length+' active members loaded.';
 }
 function renderAttendanceTable(){
 attendanceTable.innerHTML='';
 attendanceRoster.forEach((p,i)=>{
 const row=document.createElement('tr');
-[i+1,p.code,p.name,p.group].forEach(v=>{const td=document.createElement('td');td.textContent=v||'-';row.appendChild(td)});
-const td=document.createElement('td'),select=document.createElement('select');
-['Present','Absent','Leave','Late'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;o.selected=(p.status||'Present')===v;select.appendChild(o)});
-select.onchange=()=>{attendanceRoster[i].status=select.value;updateDailySummary()};
-td.appendChild(select);row.appendChild(td);attendanceTable.appendChild(row);
+[i+1,p.code,p.name,p.group].forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v||'-';
+row.appendChild(td);
+});
+const td=document.createElement('td');
+const select=document.createElement('select');
+['Present','Absent','Leave','Late'].forEach(v=>{
+const o=document.createElement('option');
+o.value=v;
+o.textContent=v;
+o.selected=(p.status||'Present')===v;
+select.appendChild(o);
+});
+select.onchange=()=>{
+attendanceRoster[i].status=select.value;
+updateDailySummary();
+};
+td.appendChild(select);
+row.appendChild(td);
+attendanceTable.appendChild(row);
 });
 }
 function markAllPresent(){
 attendanceRoster=attendanceRoster.map(x=>({...x,status:'Present'}));
-renderAttendanceTable();updateDailySummary();
+renderAttendanceTable();
+updateDailySummary();
 }
 function countAttendance(){
-return attendanceRoster.reduce((a,x)=>(a[x.status]=(a[x.status]||0)+1,a),{Present:0,Absent:0,Leave:0,Late:0});
+return attendanceRoster.reduce((a,x)=>{
+a[x.status]=(a[x.status]||0)+1;
+return a;
+},{Present:0,Absent:0,Leave:0,Late:0});
 }
 function updateDailySummary(){
 const c=countAttendance();
 dailyTotal.textContent=attendanceRoster.length;
-dailyPresent.textContent=c.Present;dailyAbsent.textContent=c.Absent;
-dailyLeave.textContent=c.Leave;dailyLate.textContent=c.Late;
+dailyPresent.textContent=c.Present;
+dailyAbsent.textContent=c.Absent;
+dailyLeave.textContent=c.Leave;
+dailyLate.textContent=c.Late;
 todayAttendance.textContent=(attendanceRoster.length?Math.round(c.Present/attendanceRoster.length*100):0)+'%';
 }
 function saveAttendance(){
@@ -693,27 +810,64 @@ const f=attendanceFilter();
 if(!f.date)return alert('Select date.');
 if(!attendanceRoster.length)return alert('Load members first.');
 const a=getAttendanceRecords();
-const rec={...f,records:attendanceRoster.map(p=>({personId:p.id,code:p.code,name:p.name,group:p.group,status:p.status||'Present'})),updatedAt:new Date().toISOString()};
-const i=a.findIndex(x=>x.date===f.date&&x.school===f.school&&x.category===f.category&&x.className===f.className&&x.section===f.section);
-if(i>=0)a[i]=rec;else a.push(rec);
-setAttendanceRecords(a);alert('Attendance saved / updated.');renderMonthlyReport();
+const rec={
+...f,
+records:attendanceRoster.map(p=>({
+personId:p.id,
+code:p.code,
+name:p.name,
+group:p.group,
+status:p.status||'Present'
+})),
+updatedAt:new Date().toISOString()
+};
+const i=a.findIndex(x=>
+x.date===f.date&&x.school===f.school&&x.category===f.category&&
+x.className===f.className&&x.section===f.section
+);
+if(i>=0)a[i]=rec;
+else a.push(rec);
+setAttendanceRecords(a);
+alert('Attendance saved / updated.');
+renderMonthlyReport();
 }
 function renderMonthlyReport(){
 if(!reportMonth.value)return;
 monthlyReportTable.innerHTML='';
-getAttendanceRecords().filter(x=>x.date.startsWith(reportMonth.value)&&(reportCategory.value==='All'||x.category===reportCategory.value)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
-const c=x.records.reduce((a,r)=>(a[r.status]=(a[r.status]||0)+1,a),{Present:0,Absent:0,Leave:0,Late:0});
-const values=[x.date,x.category,getSchoolName(x.school),x.records.length,c.Present,c.Absent,c.Leave,c.Late];
+getAttendanceRecords()
+.filter(x=>x.date.startsWith(reportMonth.value)&&(reportCategory.value==='All'||x.category===reportCategory.value))
+.sort((a,b)=>a.date.localeCompare(b.date))
+.forEach(x=>{
+const c=x.records.reduce((a,r)=>{
+a[r.status]=(a[r.status]||0)+1;
+return a;
+},{Present:0,Absent:0,Leave:0,Late:0});
+const values=[
+x.date,x.category,getSchoolName(x.school),
+x.records.length,c.Present,c.Absent,c.Leave,c.Late
+];
 const row=document.createElement('tr');
-values.forEach(v=>{const td=document.createElement('td');td.textContent=v;row.appendChild(td)});
-const td=document.createElement('td'),btn=document.createElement('button');
-btn.className='btn-edit';btn.textContent='Load / Edit';
+values.forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v;
+row.appendChild(td);
+});
+const td=document.createElement('td');
+const btn=document.createElement('button');
+btn.className='btn-edit';
+btn.textContent='Load / Edit';
 btn.onclick=()=>{
-attendanceDate.value=x.date;attendanceSchool.value=x.school;attendanceCategory.value=x.category;
-attendanceClass.value=x.className||'';attendanceSection.value=x.section||'';
-toggleStudentFilters();loadAttendanceRoster();
+attendanceDate.value=x.date;
+attendanceSchool.value=x.school;
+attendanceCategory.value=x.category;
+attendanceClass.value=x.className||'';
+attendanceSection.value=x.section||'';
+toggleStudentFilters();
+loadAttendanceRoster();
 };
-td.appendChild(btn);row.appendChild(td);monthlyReportTable.appendChild(row);
+td.appendChild(btn);
+row.appendChild(td);
+monthlyReportTable.appendChild(row);
 });
 }
 function printAttendance(){
@@ -722,463 +876,813 @@ window.print();
 }
 attendanceCategory.addEventListener('change',toggleStudentFilters);
 
-/* =====================================
-   FEES MANAGEMENT MODULE
-===================================== */
-
-const FEE_SETTINGS_KEY = 'schoolFeeSettings';
-const FEE_CHALLANS_KEY = 'schoolFeeChallans';
-const FEE_PAYMENTS_KEY = 'schoolFeePayments';
+/* FEES MANAGEMENT MODULE */
+const FEE_SETTINGS_KEY='schoolFeeSettings';
+const FEE_CHALLANS_KEY='schoolFeeChallans';
+const FEE_PAYMENTS_KEY='schoolFeePayments';
 
 function getFeeSettings(){
-    return JSON.parse(localStorage.getItem(FEE_SETTINGS_KEY) || '{"defaultFee":0,"dueDate":""}');
+return JSON.parse(localStorage.getItem(FEE_SETTINGS_KEY)||'{"defaultFee":0,"dueDate":""}');
 }
-
 function saveFeeSettings(){
-    const amount = Number(document.getElementById('defaultMonthlyFee').value);
-    const dueDate = document.getElementById('feeDueDate').value;
-
-    if(!Number.isFinite(amount) || amount < 0){
-        alert('Please enter a valid monthly fee.');
-        return;
-    }
-
-    localStorage.setItem(FEE_SETTINGS_KEY, JSON.stringify({
-        defaultFee: amount,
-        dueDate: dueDate
-    }));
-
-    alert('Fee settings saved successfully.');
+const amount=Number(defaultMonthlyFee.value);
+const dueDate=feeDueDate.value;
+if(!Number.isFinite(amount)||amount<0)return alert('Please enter a valid monthly fee.');
+localStorage.setItem(FEE_SETTINGS_KEY,JSON.stringify({defaultFee:amount,dueDate}));
+alert('Fee settings saved successfully.');
 }
-
 function getFeeChallans(){
-    return JSON.parse(localStorage.getItem(FEE_CHALLANS_KEY) || '[]');
+return JSON.parse(localStorage.getItem(FEE_CHALLANS_KEY)||'[]');
 }
-
 function saveFeeChallans(list){
-    localStorage.setItem(FEE_CHALLANS_KEY, JSON.stringify(list));
+localStorage.setItem(FEE_CHALLANS_KEY,JSON.stringify(list));
 }
-
 function getFeePayments(){
-    return JSON.parse(localStorage.getItem(FEE_PAYMENTS_KEY) || '[]');
+return JSON.parse(localStorage.getItem(FEE_PAYMENTS_KEY)||'[]');
 }
-
 function saveFeePayments(list){
-    localStorage.setItem(FEE_PAYMENTS_KEY, JSON.stringify(list));
+localStorage.setItem(FEE_PAYMENTS_KEY,JSON.stringify(list));
 }
-
 function formatPKR(amount){
-    return 'Rs. ' + Number(amount || 0).toLocaleString('en-PK');
+return 'Rs. '+Number(amount||0).toLocaleString('en-PK');
 }
-
 function getStudentMonthlyFee(student){
-    const settings = getFeeSettings();
-
-    if(student.monthlyFee !== undefined &&
-       student.monthlyFee !== null &&
-       student.monthlyFee !== ''){
-        return Number(student.monthlyFee);
-    }
-
-    return Number(settings.defaultFee || 0);
+const settings=getFeeSettings();
+if(student.monthlyFee!==undefined&&student.monthlyFee!==null&&student.monthlyFee!==''){
+return Number(student.monthlyFee);
 }
-
+return Number(settings.defaultFee||0);
+}
 function saveStudentFee(studentId){
-    const input = document.getElementById('studentFee_' + studentId);
-    const amount = Number(input.value);
-
-    if(!Number.isFinite(amount) || amount < 0){
-        alert('Enter a valid fee amount.');
-        return;
-    }
-
-    const students = getStudents() || [];
-    const index = students.findIndex(s => String(s.id) === String(studentId));
-
-    if(index < 0){
-        alert('Student not found.');
-        return;
-    }
-
-    students[index].monthlyFee = amount;
-    localStorage.setItem('students', JSON.stringify(students));
-
-    alert('Student monthly fee updated successfully.');
-    renderFeeStudents();
+const input=document.getElementById('studentFee_'+studentId);
+const amount=Number(input.value);
+if(!Number.isFinite(amount)||amount<0)return alert('Enter a valid fee amount.');
+const students=getStudents()||[];
+const index=students.findIndex(s=>String(s.id)===String(studentId));
+if(index<0)return alert('Student not found.');
+students[index].monthlyFee=amount;
+localStorage.setItem('students',JSON.stringify(students));
+alert('Student monthly fee updated successfully.');
+renderFeeStudents();
 }
-
 function renderFeeStudents(){
-    const body = document.getElementById('feeStudentTable');
-    if(!body) return;
-
-    const q = (document.getElementById('feeStudentSearch').value || '').toLowerCase();
-
-    const students = (getStudents() || []).filter(s =>
-        (s.status || 'Active') === 'Active' &&
-        JSON.stringify(s).toLowerCase().includes(q)
-    );
-
-    body.innerHTML = '';
-
-    if(!students.length){
-        body.innerHTML = '<tr><td colspan="6">No active students found.</td></tr>';
-        return;
-    }
-
-    students.forEach(s => {
-        const tr = document.createElement('tr');
-
-        [
-            s.admissionNo || '-',
-            s.name || '-',
-            s.fatherName || '-',
-            s.class || '-'
-        ].forEach(v => {
-            const td = document.createElement('td');
-            td.textContent = v;
-            tr.appendChild(td);
-        });
-
-        const feeCell = document.createElement('td');
-        const feeInput = document.createElement('input');
-
-        feeInput.type = 'number';
-        feeInput.min = '0';
-        feeInput.id = 'studentFee_' + s.id;
-        feeInput.value = getStudentMonthlyFee(s);
-        feeInput.style.width = '120px';
-
-        feeCell.appendChild(feeInput);
-        tr.appendChild(feeCell);
-
-        const action = document.createElement('td');
-        const button = document.createElement('button');
-
-        button.className = 'btn-edit';
-        button.type = 'button';
-        button.textContent = 'Save Fee';
-        button.onclick = () => saveStudentFee(s.id);
-
-        action.appendChild(button);
-        tr.appendChild(action);
-        body.appendChild(tr);
-    });
+const body=document.getElementById('feeStudentTable');
+if(!body)return;
+const q=(document.getElementById('feeStudentSearch').value||'').toLowerCase();
+const students=(getStudents()||[]).filter(s=>
+(s.status||'Active')==='Active'&&JSON.stringify(s).toLowerCase().includes(q)
+);
+body.innerHTML='';
+if(!students.length){
+body.innerHTML='<tr><td colspan="6">No active students found.</td></tr>';
+return;
 }
-
+students.forEach(s=>{
+const tr=document.createElement('tr');
+[s.admissionNo||'-',s.name||'-',s.fatherName||'-',s.class||'-'].forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v;
+tr.appendChild(td);
+});
+const feeCell=document.createElement('td');
+const feeInput=document.createElement('input');
+feeInput.type='number';
+feeInput.min='0';
+feeInput.id='studentFee_'+s.id;
+feeInput.value=getStudentMonthlyFee(s);
+feeInput.style.width='120px';
+feeCell.appendChild(feeInput);
+tr.appendChild(feeCell);
+const action=document.createElement('td');
+const button=document.createElement('button');
+button.className='btn-edit';
+button.type='button';
+button.textContent='Save Fee';
+button.onclick=()=>saveStudentFee(s.id);
+action.appendChild(button);
+tr.appendChild(action);
+body.appendChild(tr);
+});
+}
 function generateAllChallans(){
-    const month = document.getElementById('challanMonth').value;
-    const additional = Number(document.getElementById('additionalFee').value || 0);
-
-    if(!month){
-        alert('Please select fee month.');
-        return;
-    }
-
-    if(!Number.isFinite(additional) || additional < 0){
-        alert('Enter a valid additional fee.');
-        return;
-    }
-
-    const settings = getFeeSettings();
-
-    if(!settings.defaultFee || settings.defaultFee <= 0){
-        alert('Please set the default monthly fee first.');
-        return;
-    }
-
-    const students = (getStudents() || []).filter(s =>
-        (s.status || 'Active') === 'Active'
-    );
-
-    if(!students.length){
-        alert('No active students found.');
-        return;
-    }
-
-    const challans = getFeeChallans();
-
-    const existing = challans.filter(c => c.month === month);
-    const existingIds = existing.map(c => String(c.studentId));
-
-    const newStudents = students.filter(s =>
-        !existingIds.includes(String(s.id))
-    );
-
-    if(!newStudents.length){
-        alert('Challans have already been generated for all active students for this month.');
-        return;
-    }
-
-    if(!confirm(
-        'Generate challans for ' + newStudents.length +
-        ' students for ' + month + '?'
-    )){
-        return;
-    }
-
-    newStudents.forEach(s => {
-        const monthlyFee = getStudentMonthlyFee(s);
-        const total = monthlyFee + additional;
-
-        const challan = {
-            id: 'CHL-' + Date.now() + '-' + Math.random().toString(36).slice(2,7),
-            challanNo: 'CH-' + Date.now().toString().slice(-8) +
-                      '-' + Math.floor(Math.random() * 900 + 100),
-            studentId: s.id,
-            admissionNo: s.admissionNo || '',
-            studentName: s.name || '',
-            fatherName: s.fatherName || '',
-            className: s.class || '',
-            section: s.section || '',
-            school: getSchoolName(s.school),
-            month: month,
-            monthlyFee: monthlyFee,
-            additionalFee: additional,
-            total: total,
-            paid: 0,
-            balance: total,
-            status: 'Unpaid',
-            issueDate: todayISO(),
-            dueDate: settings.dueDate || ''
-        };
-
-        challans.push(challan);
-    });
-
-    saveFeeChallans(challans);
-
-    alert(newStudents.length + ' monthly challans generated successfully.');
-
-    renderFeeRecords();
+const month=challanMonth.value;
+const additional=Number(additionalFee.value||0);
+if(!month)return alert('Please select fee month.');
+if(!Number.isFinite(additional)||additional<0)return alert('Enter a valid additional fee.');
+const settings=getFeeSettings();
+if(!settings.defaultFee||settings.defaultFee<=0)return alert('Please set the default monthly fee first.');
+const students=(getStudents()||[]).filter(s=>(s.status||'Active')==='Active');
+if(!students.length)return alert('No active students found.');
+const challans=getFeeChallans();
+const existing=challans.filter(c=>c.month===month);
+const existingIds=existing.map(c=>String(c.studentId));
+const newStudents=students.filter(s=>!existingIds.includes(String(s.id)));
+if(!newStudents.length)return alert('Challans have already been generated for all active students for this month.');
+if(!confirm('Generate challans for '+newStudents.length+' students for '+month+'?'))return;
+newStudents.forEach(s=>{
+const monthlyFee=getStudentMonthlyFee(s);
+const total=monthlyFee+additional;
+challans.push({
+id:'CHL-'+Date.now()+'-'+Math.random().toString(36).slice(2,7),
+challanNo:'CH-'+Date.now().toString().slice(-8)+'-'+Math.floor(Math.random()*900+100),
+studentId:s.id,
+admissionNo:s.admissionNo||'',
+studentName:s.name||'',
+fatherName:s.fatherName||'',
+className:s.class||'',
+section:s.section||'',
+school:getSchoolName(s.school),
+month,
+monthlyFee,
+additionalFee:additional,
+total,
+paid:0,
+balance:total,
+status:'Unpaid',
+issueDate:todayISO(),
+dueDate:settings.dueDate||''
+});
+});
+saveFeeChallans(challans);
+alert(newStudents.length+' monthly challans generated successfully.');
+renderFeeRecords();
 }
-
 function renderFeeRecords(){
-    const body = document.getElementById('feeRecordTable');
-    if(!body) return;
-
-    const month = document.getElementById('feeRecordMonth').value;
-    const status = document.getElementById('feeStatusFilter').value;
-
-    let records = getFeeChallans();
-
-    if(month){
-        records = records.filter(c => c.month === month);
-    }
-
-    if(status !== 'all'){
-        records = records.filter(c => c.status === status);
-    }
-
-    body.innerHTML = '';
-
-    let totalAmount = 0;
-    let received = 0;
-    let remaining = 0;
-
-    records.forEach(c => {
-        totalAmount += Number(c.total || 0);
-        received += Number(c.paid || 0);
-        remaining += Number(c.balance || 0);
-
-        const tr = document.createElement('tr');
-
-        [
-            c.challanNo,
-            c.studentName,
-            c.className,
-            c.month,
-            formatPKR(c.total),
-            formatPKR(c.paid),
-            formatPKR(c.balance),
-            c.status
-        ].forEach(v => {
-            const td = document.createElement('td');
-            td.textContent = v || '-';
-            tr.appendChild(td);
-        });
-
-        const actions = document.createElement('td');
-
-        const print = document.createElement('button');
-        print.className = 'btn-view';
-        print.textContent = 'Print';
-        print.onclick = () => printFeeChallan(c.id);
-
-        const payment = document.createElement('button');
-        payment.className = 'btn-edit';
-        payment.textContent = 'Payment';
-        payment.onclick = () => recordFeePayment(c.id);
-
-        actions.appendChild(print);
-        actions.appendChild(payment);
-        tr.appendChild(actions);
-
-        body.appendChild(tr);
-    });
-
-    if(!records.length){
-        body.innerHTML = '<tr><td colspan="9">No challan records found.</td></tr>';
-    }
-
-    document.getElementById('feeTotalChallans').textContent = records.length;
-    document.getElementById('feeTotalAmount').textContent = formatPKR(totalAmount);
-    document.getElementById('feeReceived').textContent = formatPKR(received);
-    document.getElementById('feeRemaining').textContent = formatPKR(remaining);
+const body=document.getElementById('feeRecordTable');
+if(!body)return;
+const month=feeRecordMonth.value;
+const status=feeStatusFilter.value;
+let records=getFeeChallans();
+if(month)records=records.filter(c=>c.month===month);
+if(status!=='all')records=records.filter(c=>c.status===status);
+body.innerHTML='';
+let totalAmount=0,received=0,remaining=0;
+records.forEach(c=>{
+totalAmount+=Number(c.total||0);
+received+=Number(c.paid||0);
+remaining+=Number(c.balance||0);
+const tr=document.createElement('tr');
+[
+c.challanNo,c.studentName,c.className,c.month,
+formatPKR(c.total),formatPKR(c.paid),formatPKR(c.balance),c.status
+].forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v||'-';
+tr.appendChild(td);
+});
+const actions=document.createElement('td');
+const print=document.createElement('button');
+print.className='btn-view';
+print.textContent='Print';
+print.onclick=()=>printFeeChallan(c.id);
+const payment=document.createElement('button');
+payment.className='btn-edit';
+payment.textContent='Payment';
+payment.onclick=()=>recordFeePayment(c.id);
+actions.appendChild(print);
+actions.appendChild(payment);
+tr.appendChild(actions);
+body.appendChild(tr);
+});
+if(!records.length)body.innerHTML='<tr><td colspan="9">No challan records found.</td></tr>';
+feeTotalChallans.textContent=records.length;
+feeTotalAmount.textContent=formatPKR(totalAmount);
+feeReceived.textContent=formatPKR(received);
+feeRemaining.textContent=formatPKR(remaining);
 }
-
 function recordFeePayment(id){
-    const challans = getFeeChallans();
-    const index = challans.findIndex(c => String(c.id) === String(id));
-
-    if(index < 0) return alert('Challan not found.');
-
-    const challan = challans[index];
-
-    if(challan.balance <= 0){
-        alert('This challan is already fully paid.');
-        return;
-    }
-
-    const amount = Number(prompt(
-        'Remaining balance: ' + formatPKR(challan.balance) +
-        '\nEnter payment received:'
-    ));
-
-    if(!Number.isFinite(amount) || amount <= 0){
-        alert('Please enter a valid payment amount.');
-        return;
-    }
-
-    if(amount > challan.balance){
-        alert('Payment cannot be greater than remaining balance.');
-        return;
-    }
-
-    challan.paid = Number(challan.paid || 0) + amount;
-    challan.balance = Number(challan.total) - challan.paid;
-
-    challan.status = challan.balance === 0 ? 'Paid' : 'Partial';
-
-    const payments = getFeePayments();
-
-    payments.push({
-        id: 'PAY-' + Date.now(),
-        challanId: challan.id,
-        challanNo: challan.challanNo,
-        studentName: challan.studentName,
-        amount: amount,
-        date: todayISO(),
-        month: challan.month
-    });
-
-    saveFeePayments(payments);
-    saveFeeChallans(challans);
-
-    alert('Payment saved successfully.');
-    renderFeeRecords();
+const challans=getFeeChallans();
+const index=challans.findIndex(c=>String(c.id)===String(id));
+if(index<0)return alert('Challan not found.');
+const challan=challans[index];
+if(challan.balance<=0)return alert('This challan is already fully paid.');
+const amount=Number(prompt('Remaining balance: '+formatPKR(challan.balance)+'\nEnter payment received:'));
+if(!Number.isFinite(amount)||amount<=0)return alert('Please enter a valid payment amount.');
+if(amount>challan.balance)return alert('Payment cannot be greater than remaining balance.');
+challan.paid=Number(challan.paid||0)+amount;
+challan.balance=Number(challan.total)-challan.paid;
+challan.status=challan.balance===0?'Paid':'Partial';
+const payments=getFeePayments();
+payments.push({
+id:'PAY-'+Date.now(),
+challanId:challan.id,
+challanNo:challan.challanNo,
+studentName:challan.studentName,
+amount,
+date:todayISO(),
+month:challan.month
+});
+saveFeePayments(payments);
+saveFeeChallans(challans);
+alert('Payment saved successfully.');
+renderFeeRecords();
 }
-
 function printFeeChallan(id){
-    const challan = getFeeChallans().find(c => String(c.id) === String(id));
-
-    if(!challan){
-        alert('Challan not found.');
-        return;
-    }
-
-    const w = window.open('', '_blank', 'width=950,height=750');
-
-    if(!w){
-        alert('Please allow pop-ups to print challan.');
-        return;
-    }
-
-    const copies = ['SCHOOL COPY', 'BANK COPY', 'PARENT COPY'];
-
-    const html = copies.map(copy => `
-        <div class="challan">
-            <div class="top">
-                <h2>${escapeHtml(challan.school || 'School')}</h2>
-                <h3>FEE CHALLAN</h3>
-                <b>${copy}</b>
-            </div>
-
-            <hr>
-
-            <div class="details">
-                <p><b>Challan No:</b> ${escapeHtml(challan.challanNo)}</p>
-                <p><b>Fee Month:</b> ${escapeHtml(challan.month)}</p>
-                <p><b>Issue Date:</b> ${escapeHtml(challan.issueDate)}</p>
-                <p><b>Due Date:</b> ${escapeHtml(challan.dueDate || '-')}</p>
-                <p><b>Student Name:</b> ${escapeHtml(challan.studentName)}</p>
-                <p><b>Father Name:</b> ${escapeHtml(challan.fatherName)}</p>
-                <p><b>Admission No:</b> ${escapeHtml(challan.admissionNo)}</p>
-                <p><b>Class:</b> ${escapeHtml(challan.className)} / ${escapeHtml(challan.section)}</p>
-            </div>
-
-            <table>
-                <tr><th>Description</th><th>Amount</th></tr>
-                <tr><td>Monthly Tuition Fee</td><td>${formatPKR(challan.monthlyFee)}</td></tr>
-                <tr><td>Additional Fee</td><td>${formatPKR(challan.additionalFee)}</td></tr>
-                <tr><th>Total Fee</th><th>${formatPKR(challan.total)}</th></tr>
-                <tr><td>Paid</td><td>${formatPKR(challan.paid)}</td></tr>
-                <tr><th>Remaining Balance</th><th>${formatPKR(challan.balance)}</th></tr>
-            </table>
-
-            <p><b>Payment Status:</b> ${escapeHtml(challan.status)}</p>
-
-            <div class="sign">
-                <span>Cashier Signature</span>
-                <span>Principal Signature</span>
-            </div>
-        </div>
-    `).join('');
-
-    w.document.write(`
-    <!DOCTYPE html>
-    <html>
-    <head>
-    <title>Fee Challan</title>
-    <meta charset="UTF-8">
-    <style>
-    body{font-family:Arial;padding:15px;color:#222}
-    .challan{border:1px solid #888;padding:18px;margin:0 auto 20px;max-width:750px;page-break-after:always}
-    .top{text-align:center;color:#087443}
-    .details{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
-    .details p{margin:7px 0}
-    table{width:100%;border-collapse:collapse;margin-top:15px}
-    th,td{border:1px solid #888;padding:9px;text-align:left}
-    th{background:#edf7f1}
-    .sign{display:flex;justify-content:space-between;margin-top:55px}
-    .sign span{border-top:1px solid #333;padding-top:7px;width:35%;text-align:center}
-    @media print{body{padding:0}.challan{margin:0 auto 12px}}
-    </style>
-    </head>
-    <body>
-    ${html}
-    <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
-    </body>
-    </html>
-    `);
-
-    w.document.close();
+const challan=getFeeChallans().find(c=>String(c.id)===String(id));
+if(!challan)return alert('Challan not found.');
+const w=window.open('','_blank','width=950,height=750');
+if(!w)return alert('Please allow pop-ups to print challan.');
+const copies=['SCHOOL COPY','BANK COPY','PARENT COPY'];
+const html=copies.map(copy=>`
+<div class="challan">
+<div class="top">
+<h2>${escapeHtml(challan.school||'School')}</h2>
+<h3>FEE CHALLAN</h3>
+<b>${copy}</b>
+</div>
+<hr>
+<div class="details">
+<p><b>Challan No:</b> ${escapeHtml(challan.challanNo)}</p>
+<p><b>Fee Month:</b> ${escapeHtml(challan.month)}</p>
+<p><b>Issue Date:</b> ${escapeHtml(challan.issueDate)}</p>
+<p><b>Due Date:</b> ${escapeHtml(challan.dueDate||'-')}</p>
+<p><b>Student Name:</b> ${escapeHtml(challan.studentName)}</p>
+<p><b>Father Name:</b> ${escapeHtml(challan.fatherName)}</p>
+<p><b>Admission No:</b> ${escapeHtml(challan.admissionNo)}</p>
+<p><b>Class:</b> ${escapeHtml(challan.className)} / ${escapeHtml(challan.section)}</p>
+</div>
+<table>
+<tr><th>Description</th><th>Amount</th></tr>
+<tr><td>Monthly Tuition Fee</td><td>${formatPKR(challan.monthlyFee)}</td></tr>
+<tr><td>Additional Fee</td><td>${formatPKR(challan.additionalFee)}</td></tr>
+<tr><th>Total Fee</th><th>${formatPKR(challan.total)}</th></tr>
+<tr><td>Paid</td><td>${formatPKR(challan.paid)}</td></tr>
+<tr><th>Remaining Balance</th><th>${formatPKR(challan.balance)}</th></tr>
+</table>
+<p><b>Payment Status:</b> ${escapeHtml(challan.status)}</p>
+<div class="sign">
+<span>Cashier Signature</span>
+<span>Principal Signature</span>
+</div>
+</div>
+`).join('');
+w.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+<title>Fee Challan</title>
+<meta charset="UTF-8">
+<style>
+body{font-family:Arial;padding:15px;color:#222}
+.challan{border:1px solid #888;padding:18px;margin:0 auto 20px;max-width:750px;page-break-after:always}
+.top{text-align:center;color:#087443}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+.details p{margin:7px 0}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #888;padding:9px;text-align:left}
+th{background:#edf7f1}
+.sign{display:flex;justify-content:space-between;margin-top:55px}
+.sign span{border-top:1px solid #333;padding-top:7px;width:35%;text-align:center}
+@media print{body{padding:0}.challan{margin:0 auto 12px}}
+</style>
+</head>
+<body>
+${html}
+<script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
+</body>
+</html>
+`);
+w.document.close();
+}
+/* FEES INITIALIZATION */
+function initializeFees(){
+const settings=getFeeSettings();
+defaultMonthlyFee.value=settings.defaultFee||'';
+feeDueDate.value=settings.dueDate||'';
+const month=todayISO().slice(0,7);
+challanMonth.value=month;
+feeRecordMonth.value=month;
+renderFeeStudents();
+renderFeeRecords();
 }
 
-/* FEES INITIALIZATION */
+/* =====================================
+   EXAMS & RESULTS MODULE
+   Uses separate Local Storage keys.
+===================================== */
+const EXAMS_KEY='schoolExams';
+const EXAM_RESULTS_KEY='schoolExamResults';
+let examLoadedRoster=[];
 
-function initializeFees(){
-    const settings = getFeeSettings();
+function getExams(){
+try{return JSON.parse(localStorage.getItem(EXAMS_KEY)||'[]')}
+catch(e){return []}
+}
+function saveExams(list){
+localStorage.setItem(EXAMS_KEY,JSON.stringify(list));
+}
+function getExamResults(){
+try{return JSON.parse(localStorage.getItem(EXAM_RESULTS_KEY)||'[]')}
+catch(e){return []}
+}
+function saveExamResults(list){
+localStorage.setItem(EXAM_RESULTS_KEY,JSON.stringify(list));
+}
+function examCampusName(value){
+return value==='all'?'All Schools':getSchoolName(value);
+}
 
-    document.getElementById('defaultMonthlyFee').value = settings.defaultFee || '';
-    document.getElementById('feeDueDate').value = settings.dueDate || '';
+function addExamSubject(name='',total='100'){
+const wrap=document.getElementById('examSubjects');
+if(wrap.children.length>=12){
+alert('Maximum 12 subjects are allowed.');
+return;
+}
+const row=document.createElement('div');
+row.className='subject-item';
+row.style.marginBottom='8px';
 
-    const month = todayISO().slice(0,7);
+const subject=document.createElement('input');
+subject.type='text';
+subject.className='exam-subject-name';
+subject.placeholder='Subject name';
+subject.value=name;
+subject.required=true;
 
-    document.getElementById('challanMonth').value = month;
-    document.getElementById('feeRecordMonth').value = month;
+const marks=document.createElement('input');
+marks.type='number';
+marks.className='exam-subject-total';
+marks.placeholder='Total marks';
+marks.min='1';
+marks.max='10000';
+marks.step='0.01';
+marks.value=total;
+marks.required=true;
+marks.style.maxWidth='150px';
 
-    renderFeeStudents();
-    renderFeeRecords();
+const remove=document.createElement('button');
+remove.type='button';
+remove.className='subject-remove';
+remove.textContent='Remove';
+remove.onclick=()=>{
+row.remove();
+if(!wrap.children.length)addExamSubject();
+};
+
+row.append(subject,marks,remove);
+wrap.appendChild(row);
+}
+
+function resetExamForm(){
+document.getElementById('examForm').reset();
+document.getElementById('examDate').value=todayISO();
+document.getElementById('examSubjects').innerHTML='';
+addExamSubject();
+addExamSubject();
+}
+
+function renderExamList(){
+const body=document.getElementById('examListTable');
+body.innerHTML='';
+const exams=getExams().slice().sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
+
+if(!exams.length){
+body.innerHTML='<tr><td colspan="7">No examinations created yet.</td></tr>';
+return;
+}
+
+exams.forEach(exam=>{
+const tr=document.createElement('tr');
+[
+exam.name,
+exam.className,
+exam.section,
+examCampusName(exam.school),
+exam.date,
+(exam.subjects||[]).length
+].forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v||'-';
+tr.appendChild(td);
+});
+
+const td=document.createElement('td');
+
+const selectBtn=document.createElement('button');
+selectBtn.type='button';
+selectBtn.className='btn-edit';
+selectBtn.textContent='Enter Marks';
+selectBtn.onclick=()=>{
+document.getElementById('marksExamSelect').value=exam.id;
+document.getElementById('resultExamSelect').value=exam.id;
+loadExamStudents();
+};
+td.appendChild(selectBtn);
+
+const del=document.createElement('button');
+del.type='button';
+del.className='btn-secondary btn-small';
+del.style.border=0;
+del.style.borderRadius='5px';
+del.style.padding='7px 10px';
+del.style.cursor='pointer';
+del.style.color='white';
+del.textContent='Delete';
+del.onclick=()=>deleteExam(exam.id);
+td.appendChild(del);
+
+tr.appendChild(td);
+body.appendChild(tr);
+});
+}
+
+function refreshExamDropdowns(){
+['marksExamSelect','resultExamSelect'].forEach(id=>{
+const select=document.getElementById(id);
+const previous=select.value;
+select.innerHTML='<option value="">Select Examination</option>';
+
+getExams().forEach(exam=>{
+const option=document.createElement('option');
+option.value=exam.id;
+option.textContent=exam.name+' - '+exam.className+' / '+exam.section+' ('+exam.date+')';
+select.appendChild(option);
+});
+
+if(getExams().some(x=>x.id===previous))select.value=previous;
+});
+}
+
+function deleteExam(id){
+const exam=getExams().find(x=>x.id===id);
+if(!exam)return;
+if(!confirm('Delete this examination and all its saved results?'))return;
+
+saveExams(getExams().filter(x=>x.id!==id));
+saveExamResults(getExamResults().filter(x=>x.examId!==id));
+
+examLoadedRoster=[];
+document.getElementById('marksEntryHead').innerHTML='';
+document.getElementById('marksEntryTable').innerHTML='<tr><td>Select an examination first.</td></tr>';
+
+renderExamList();
+refreshExamDropdowns();
+renderExamResults();
+}
+
+document.getElementById('examForm').addEventListener('submit',function(e){
+e.preventDefault();
+
+const name=document.getElementById('examName').value.trim();
+const className=document.getElementById('examClass').value;
+const section=document.getElementById('examSection').value;
+const school=document.getElementById('examSchool').value;
+const date=document.getElementById('examDate').value;
+
+const rows=Array.from(document.querySelectorAll('#examSubjects .subject-item'));
+const subjects=rows.map(row=>({
+name:row.querySelector('.exam-subject-name').value.trim(),
+total:Number(row.querySelector('.exam-subject-total').value)
+}));
+
+if(!name||!className||!section||!date){
+return alert('Please complete all required examination details.');
+}
+
+if(!subjects.length||subjects.some(x=>!x.name||!Number.isFinite(x.total)||x.total<=0)){
+return alert('Enter a valid subject name and total marks for every subject.');
+}
+
+if(new Set(subjects.map(x=>x.name.toLowerCase())).size!==subjects.length){
+return alert('Duplicate subject names are not allowed.');
+}
+
+const exams=getExams();
+
+if(exams.some(x=>
+x.name.toLowerCase()===name.toLowerCase()&&
+x.className===className&&
+x.section===section&&
+x.school===school&&
+x.date===date
+)){
+return alert('This examination already exists.');
+}
+
+const exam={
+id:'EXM-'+Date.now(),
+name,
+className,
+section,
+school,
+date,
+subjects,
+createdAt:new Date().toISOString()
+};
+
+exams.push(exam);
+saveExams(exams);
+resetExamForm();
+renderExamList();
+refreshExamDropdowns();
+
+document.getElementById('marksExamSelect').value=exam.id;
+document.getElementById('resultExamSelect').value=exam.id;
+
+alert('Examination created successfully. Now load students to enter marks.');
+loadExamStudents();
+});
+
+function getExamStudents(exam){
+if(typeof getStudents!=='function')return [];
+
+return (getStudents()||[]).filter(s=>
+(s.status||'Active')==='Active'&&
+s.class===exam.className&&
+s.section===exam.section&&
+(exam.school==='all'||(s.school||'main')===exam.school)
+).sort((a,b)=>
+String(a.rollNumber||a.admissionNo||a.name).localeCompare(
+String(b.rollNumber||b.admissionNo||b.name),
+undefined,
+{numeric:true}
+)
+);
+}
+
+function loadExamStudents(){
+const id=document.getElementById('marksExamSelect').value;
+const exam=getExams().find(x=>x.id===id);
+const head=document.getElementById('marksEntryHead');
+const body=document.getElementById('marksEntryTable');
+const msg=document.getElementById('marksMessage');
+
+head.innerHTML='';
+body.innerHTML='';
+examLoadedRoster=[];
+
+if(!exam){
+msg.textContent='Please select an examination.';
+body.innerHTML='<tr><td>Select an examination first.</td></tr>';
+return;
+}
+
+const students=getExamStudents(exam);
+const saved=getExamResults().filter(x=>x.examId===id);
+
+if(!students.length){
+msg.textContent='No active students found for '+exam.className+' / '+exam.section+'. Check student class, section and campus.';
+body.innerHTML='<tr><td colspan="'+(4+exam.subjects.length)+'">No matching active students found.</td></tr>';
+return;
+}
+
+const hr=document.createElement('tr');
+
+[
+'#',
+'Admission No.',
+'Student Name',
+'Father Name',
+...exam.subjects.map(x=>x.name+' (/'+x.total+')')
+].forEach(v=>{
+const th=document.createElement('th');
+th.textContent=v;
+hr.appendChild(th);
+});
+head.appendChild(hr);
+
+students.forEach((student,index)=>{
+const old=saved.find(x=>String(x.studentId)===String(student.id));
+examLoadedRoster.push({student,old});
+
+const tr=document.createElement('tr');
+
+[
+index+1,
+student.admissionNo||student.rollNumber||student.id,
+student.name,
+student.fatherName||'-'
+].forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v;
+tr.appendChild(td);
+});
+
+exam.subjects.forEach((subject,i)=>{
+const td=document.createElement('td');
+const input=document.createElement('input');
+
+input.type='number';
+input.min='0';
+input.max=String(subject.total);
+input.step='0.01';
+input.className='exam-mark-input';
+input.dataset.studentId=String(student.id);
+input.dataset.subjectIndex=String(i);
+input.style.width='105px';
+input.style.margin='0';
+input.placeholder='0 - '+subject.total;
+
+const previous=old&&old.subjects?old.subjects[i]:null;
+input.value=previous&&Number.isFinite(Number(previous.obtained))?previous.obtained:'';
+
+td.appendChild(input);
+tr.appendChild(td);
+});
+
+body.appendChild(tr);
+});
+
+msg.textContent=students.length+' active students loaded. Enter marks for every subject, then click Save All Marks.';
+}
+
+function calculateExamGrade(percentage){
+if(percentage>=80)return 'A+';
+if(percentage>=70)return 'A';
+if(percentage>=60)return 'B';
+if(percentage>=50)return 'C';
+if(percentage>=40)return 'D';
+return 'F';
+}
+
+function saveExamMarks(){
+const id=document.getElementById('marksExamSelect').value;
+const exam=getExams().find(x=>x.id===id);
+
+if(!exam)return alert('Please select an examination and load students.');
+if(!examLoadedRoster.length)return alert('Please click Load Students first.');
+
+const inputs=Array.from(document.querySelectorAll('#marksEntryTable .exam-mark-input'));
+const resultRows=[];
+
+for(const item of examLoadedRoster){
+const subjects=[];
+let obtainedTotal=0;
+let totalMarks=0;
+
+for(let i=0;i<exam.subjects.length;i++){
+const input=inputs.find(x=>
+x.dataset.studentId===String(item.student.id)&&
+Number(x.dataset.subjectIndex)===i
+);
+
+if(!input||input.value.trim()===''){
+return alert('Please enter marks for every subject. Missing marks for '+item.student.name+'.');
+}
+
+const obtained=Number(input.value);
+const total=Number(exam.subjects[i].total);
+
+if(!Number.isFinite(obtained)||obtained<0||obtained>total){
+return alert('Invalid marks for '+item.student.name+' in '+exam.subjects[i].name+'. Marks must be between 0 and '+total+'.');
+}
+
+subjects.push({
+subject:exam.subjects[i].name,
+obtained,
+total
+});
+
+obtainedTotal+=obtained;
+totalMarks+=total;
+}
+
+const percentage=totalMarks?(obtainedTotal/totalMarks)*100:0;
+
+resultRows.push({
+examId:id,
+studentId:item.student.id,
+admissionNo:item.student.admissionNo||item.student.rollNumber||'',
+studentName:item.student.name||'',
+fatherName:item.student.fatherName||'',
+rollNumber:item.student.rollNumber||'',
+className:exam.className,
+section:exam.section,
+school:item.student.school||exam.school,
+subjects,
+totalObtained:obtainedTotal,
+totalMarks,
+percentage:Number(percentage.toFixed(2)),
+grade:calculateExamGrade(percentage),
+result:percentage>=40?'Pass':'Fail',
+updatedAt:new Date().toISOString()
+});
+}
+
+const all=getExamResults().filter(x=>
+!(x.examId===id&&resultRows.some(r=>String(r.studentId)===String(x.studentId)))
+);
+
+saveExamResults(all.concat(resultRows));
+document.getElementById('resultExamSelect').value=id;
+
+alert('Marks saved successfully for '+resultRows.length+' students.');
+renderExamResults();
+}
+
+function getSelectedExamResults(){
+const id=document.getElementById('resultExamSelect').value;
+return getExamResults()
+.filter(x=>x.examId===id)
+.sort((a,b)=>b.percentage-a.percentage||String(a.studentName).localeCompare(String(b.studentName)));
+}
+
+function renderExamResults(){
+const id=document.getElementById('resultExamSelect').value;
+const exam=getExams().find(x=>x.id===id);
+const body=document.getElementById('resultTable');
+const msg=document.getElementById('resultMessage');
+body.innerHTML='';
+
+if(!exam){
+msg.textContent='Select an examination to view saved results.';
+body.innerHTML='<tr><td colspan="9">No examination selected.</td></tr>';
+return;
+}
+
+const results=getSelectedExamResults();
+
+if(!results.length){
+msg.textContent='No marks have been saved for this examination yet.';
+body.innerHTML='<tr><td colspan="9">No result records found.</td></tr>';
+return;
+}
+
+msg.textContent=results.length+' student result(s). Merit position is based on percentage.';
+
+results.forEach((r,i)=>{
+const tr=document.createElement('tr');
+
+[
+i+1,
+r.admissionNo||'-',
+r.studentName,
+r.totalObtained,
+r.totalMarks,
+r.percentage.toFixed(2)+'%',
+r.grade,
+r.result
+].forEach(v=>{
+const td=document.createElement('td');
+td.textContent=v;
+tr.appendChild(td);
+});
+
+const td=document.createElement('td');
+const btn=document.createElement('button');
+btn.type='button';
+btn.className='btn-edit no-print';
+btn.textContent='Print Card';
+btn.onclick=()=>printStudentResult(r.examId,r.studentId);
+td.appendChild(btn);
+tr.appendChild(td);
+body.appendChild(tr);
+});
+}
+
+function printStudentResult(examId,studentId){
+const exam=getExams().find(x=>x.id===examId);
+const r=getExamResults().find(x=>x.examId===examId&&String(x.studentId)===String(studentId));
+
+if(!exam||!r)return alert('Result record not found.');
+
+const w=window.open('','_blank','width=900,height=750');
+if(!w)return alert('Please allow pop-ups to print result card.');
+
+const rows=(r.subjects||[]).map(x=>
+'<tr><td>'+escapeHtml(x.subject)+'</td><td>'+escapeHtml(x.total)+'</td><td>'+escapeHtml(x.obtained)+'</td><td>'+
+(Number(x.total)?(Number(x.obtained)/Number(x.total))*100:0).toFixed(2)+'%</td></tr>'
+).join('');
+
+w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Student Result Card</title><style>body{font-family:Arial;padding:25px;color:#222}.sheet{max-width:800px;margin:auto;border:1px solid #ccc;padding:25px}h1,h2{color:#087443;text-align:center}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #bbb;padding:10px;text-align:left}th{background:#edf7f1}.info{display:grid;grid-template-columns:1fr 1fr;gap:10px}.summary{margin-top:20px;padding:15px;background:#edf7f1}.sign{display:flex;justify-content:space-between;margin-top:75px}.sign span{border-top:1px solid #333;width:35%;text-align:center;padding-top:8px}@media print{body{padding:0}}</style></head><body><div class="sheet"><h1>School Management System</h1><h2>Student Result Card</h2><p style="text-align:center"><b>'+escapeHtml(exam.name)+'</b></p><div class="info"><div><b>Student:</b> '+escapeHtml(r.studentName)+'</div><div><b>Father:</b> '+escapeHtml(r.fatherName||'-')+'</div><div><b>Admission No:</b> '+escapeHtml(r.admissionNo||'-')+'</div><div><b>Roll No:</b> '+escapeHtml(r.rollNumber||'-')+'</div><div><b>Class / Section:</b> '+escapeHtml(r.className)+' / '+escapeHtml(r.section)+'</div><div><b>Exam Date:</b> '+escapeHtml(exam.date)+'</div></div><table><thead><tr><th>Subject</th><th>Total Marks</th><th>Obtained Marks</th><th>Percentage</th></tr></thead><tbody>'+rows+'</tbody></table><div class="summary"><b>Total:</b> '+r.totalObtained+' / '+r.totalMarks+' &nbsp; <b>Percentage:</b> '+r.percentage.toFixed(2)+'% &nbsp; <b>Grade:</b> '+escapeHtml(r.grade)+' &nbsp; <b>Result:</b> '+escapeHtml(r.result)+'</div><div class="sign"><span>Class Teacher Signature</span><span>Principal Signature</span></div></div><script>window.onload=function(){setTimeout(function(){window.print()},300)};<\/script></body></html>');
+w.document.close();
+}
+
+function printExamMeritList(){
+const id=document.getElementById('resultExamSelect').value;
+const exam=getExams().find(x=>x.id===id);
+const results=getSelectedExamResults();
+
+if(!exam)return alert('Select an examination first.');
+if(!results.length)return alert('No results available to print.');
+
+const rows=results.map((r,i)=>
+'<tr><td>'+(i+1)+'</td><td>'+escapeHtml(r.admissionNo||'-')+'</td><td>'+escapeHtml(r.studentName)+'</td><td>'+r.totalObtained+'</td><td>'+r.totalMarks+'</td><td>'+r.percentage.toFixed(2)+'%</td><td>'+escapeHtml(r.grade)+'</td><td>'+escapeHtml(r.result)+'</td></tr>'
+).join('');
+
+const w=window.open('','_blank','width=1000,height=750');
+if(!w)return alert('Please allow pop-ups to print merit list.');
+
+w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Class Result</title><style>body{font-family:Arial;padding:20px}h2{text-align:center;color:#087443}p{text-align:center}table{width:100%;border-collapse:collapse;margin-top:20px}th,td{border:1px solid #aaa;padding:8px;text-align:left;font-size:13px}th{background:#edf7f1}@media print{body{padding:0}}</style></head><body><h2>Class Examination Result / Merit List</h2><p><b>'+escapeHtml(exam.name)+'</b> | '+escapeHtml(exam.className)+' / '+escapeHtml(exam.section)+' | Date: '+escapeHtml(exam.date)+'</p><table><thead><tr><th>Position</th><th>Admission No.</th><th>Student Name</th><th>Obtained</th><th>Total</th><th>Percentage</th><th>Grade</th><th>Result</th></tr></thead><tbody>'+rows+'</tbody></table><script>window.onload=function(){setTimeout(function(){window.print()},300)};<\/script></body></html>');
+w.document.close();
+}
+
+function initializeExams(){
+document.getElementById('examDate').value=todayISO();
+document.getElementById('examSubjects').innerHTML='';
+addExamSubject();
+addExamSubject();
+renderExamList();
+refreshExamDropdowns();
+
+document.getElementById('marksExamSelect').addEventListener('change',()=>{
+examLoadedRoster=[];
+document.getElementById('marksEntryHead').innerHTML='';
+document.getElementById('marksEntryTable').innerHTML='<tr><td>Click Load Students.</td></tr>';
+document.getElementById('marksMessage').textContent='Click Load Students to enter marks.';
+});
+
+document.getElementById('resultExamSelect').addEventListener('change',renderExamResults);
 }
 
 /* INITIAL LOAD */
@@ -1193,6 +1697,7 @@ toggleStudentFilters();
 renderMonthlyReport();
 updateDailySummary();
 initializeFees();
+initializeExams();
 </script>
 </body>
 </html>
