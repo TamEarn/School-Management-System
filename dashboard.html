@@ -722,6 +722,465 @@ window.print();
 }
 attendanceCategory.addEventListener('change',toggleStudentFilters);
 
+/* =====================================
+   FEES MANAGEMENT MODULE
+===================================== */
+
+const FEE_SETTINGS_KEY = 'schoolFeeSettings';
+const FEE_CHALLANS_KEY = 'schoolFeeChallans';
+const FEE_PAYMENTS_KEY = 'schoolFeePayments';
+
+function getFeeSettings(){
+    return JSON.parse(localStorage.getItem(FEE_SETTINGS_KEY) || '{"defaultFee":0,"dueDate":""}');
+}
+
+function saveFeeSettings(){
+    const amount = Number(document.getElementById('defaultMonthlyFee').value);
+    const dueDate = document.getElementById('feeDueDate').value;
+
+    if(!Number.isFinite(amount) || amount < 0){
+        alert('Please enter a valid monthly fee.');
+        return;
+    }
+
+    localStorage.setItem(FEE_SETTINGS_KEY, JSON.stringify({
+        defaultFee: amount,
+        dueDate: dueDate
+    }));
+
+    alert('Fee settings saved successfully.');
+}
+
+function getFeeChallans(){
+    return JSON.parse(localStorage.getItem(FEE_CHALLANS_KEY) || '[]');
+}
+
+function saveFeeChallans(list){
+    localStorage.setItem(FEE_CHALLANS_KEY, JSON.stringify(list));
+}
+
+function getFeePayments(){
+    return JSON.parse(localStorage.getItem(FEE_PAYMENTS_KEY) || '[]');
+}
+
+function saveFeePayments(list){
+    localStorage.setItem(FEE_PAYMENTS_KEY, JSON.stringify(list));
+}
+
+function formatPKR(amount){
+    return 'Rs. ' + Number(amount || 0).toLocaleString('en-PK');
+}
+
+function getStudentMonthlyFee(student){
+    const settings = getFeeSettings();
+
+    if(student.monthlyFee !== undefined &&
+       student.monthlyFee !== null &&
+       student.monthlyFee !== ''){
+        return Number(student.monthlyFee);
+    }
+
+    return Number(settings.defaultFee || 0);
+}
+
+function saveStudentFee(studentId){
+    const input = document.getElementById('studentFee_' + studentId);
+    const amount = Number(input.value);
+
+    if(!Number.isFinite(amount) || amount < 0){
+        alert('Enter a valid fee amount.');
+        return;
+    }
+
+    const students = getStudents() || [];
+    const index = students.findIndex(s => String(s.id) === String(studentId));
+
+    if(index < 0){
+        alert('Student not found.');
+        return;
+    }
+
+    students[index].monthlyFee = amount;
+    localStorage.setItem('students', JSON.stringify(students));
+
+    alert('Student monthly fee updated successfully.');
+    renderFeeStudents();
+}
+
+function renderFeeStudents(){
+    const body = document.getElementById('feeStudentTable');
+    if(!body) return;
+
+    const q = (document.getElementById('feeStudentSearch').value || '').toLowerCase();
+
+    const students = (getStudents() || []).filter(s =>
+        (s.status || 'Active') === 'Active' &&
+        JSON.stringify(s).toLowerCase().includes(q)
+    );
+
+    body.innerHTML = '';
+
+    if(!students.length){
+        body.innerHTML = '<tr><td colspan="6">No active students found.</td></tr>';
+        return;
+    }
+
+    students.forEach(s => {
+        const tr = document.createElement('tr');
+
+        [
+            s.admissionNo || '-',
+            s.name || '-',
+            s.fatherName || '-',
+            s.class || '-'
+        ].forEach(v => {
+            const td = document.createElement('td');
+            td.textContent = v;
+            tr.appendChild(td);
+        });
+
+        const feeCell = document.createElement('td');
+        const feeInput = document.createElement('input');
+
+        feeInput.type = 'number';
+        feeInput.min = '0';
+        feeInput.id = 'studentFee_' + s.id;
+        feeInput.value = getStudentMonthlyFee(s);
+        feeInput.style.width = '120px';
+
+        feeCell.appendChild(feeInput);
+        tr.appendChild(feeCell);
+
+        const action = document.createElement('td');
+        const button = document.createElement('button');
+
+        button.className = 'btn-edit';
+        button.type = 'button';
+        button.textContent = 'Save Fee';
+        button.onclick = () => saveStudentFee(s.id);
+
+        action.appendChild(button);
+        tr.appendChild(action);
+        body.appendChild(tr);
+    });
+}
+
+function generateAllChallans(){
+    const month = document.getElementById('challanMonth').value;
+    const additional = Number(document.getElementById('additionalFee').value || 0);
+
+    if(!month){
+        alert('Please select fee month.');
+        return;
+    }
+
+    if(!Number.isFinite(additional) || additional < 0){
+        alert('Enter a valid additional fee.');
+        return;
+    }
+
+    const settings = getFeeSettings();
+
+    if(!settings.defaultFee || settings.defaultFee <= 0){
+        alert('Please set the default monthly fee first.');
+        return;
+    }
+
+    const students = (getStudents() || []).filter(s =>
+        (s.status || 'Active') === 'Active'
+    );
+
+    if(!students.length){
+        alert('No active students found.');
+        return;
+    }
+
+    const challans = getFeeChallans();
+
+    const existing = challans.filter(c => c.month === month);
+    const existingIds = existing.map(c => String(c.studentId));
+
+    const newStudents = students.filter(s =>
+        !existingIds.includes(String(s.id))
+    );
+
+    if(!newStudents.length){
+        alert('Challans have already been generated for all active students for this month.');
+        return;
+    }
+
+    if(!confirm(
+        'Generate challans for ' + newStudents.length +
+        ' students for ' + month + '?'
+    )){
+        return;
+    }
+
+    newStudents.forEach(s => {
+        const monthlyFee = getStudentMonthlyFee(s);
+        const total = monthlyFee + additional;
+
+        const challan = {
+            id: 'CHL-' + Date.now() + '-' + Math.random().toString(36).slice(2,7),
+            challanNo: 'CH-' + Date.now().toString().slice(-8) +
+                      '-' + Math.floor(Math.random() * 900 + 100),
+            studentId: s.id,
+            admissionNo: s.admissionNo || '',
+            studentName: s.name || '',
+            fatherName: s.fatherName || '',
+            className: s.class || '',
+            section: s.section || '',
+            school: getSchoolName(s.school),
+            month: month,
+            monthlyFee: monthlyFee,
+            additionalFee: additional,
+            total: total,
+            paid: 0,
+            balance: total,
+            status: 'Unpaid',
+            issueDate: todayISO(),
+            dueDate: settings.dueDate || ''
+        };
+
+        challans.push(challan);
+    });
+
+    saveFeeChallans(challans);
+
+    alert(newStudents.length + ' monthly challans generated successfully.');
+
+    renderFeeRecords();
+}
+
+function renderFeeRecords(){
+    const body = document.getElementById('feeRecordTable');
+    if(!body) return;
+
+    const month = document.getElementById('feeRecordMonth').value;
+    const status = document.getElementById('feeStatusFilter').value;
+
+    let records = getFeeChallans();
+
+    if(month){
+        records = records.filter(c => c.month === month);
+    }
+
+    if(status !== 'all'){
+        records = records.filter(c => c.status === status);
+    }
+
+    body.innerHTML = '';
+
+    let totalAmount = 0;
+    let received = 0;
+    let remaining = 0;
+
+    records.forEach(c => {
+        totalAmount += Number(c.total || 0);
+        received += Number(c.paid || 0);
+        remaining += Number(c.balance || 0);
+
+        const tr = document.createElement('tr');
+
+        [
+            c.challanNo,
+            c.studentName,
+            c.className,
+            c.month,
+            formatPKR(c.total),
+            formatPKR(c.paid),
+            formatPKR(c.balance),
+            c.status
+        ].forEach(v => {
+            const td = document.createElement('td');
+            td.textContent = v || '-';
+            tr.appendChild(td);
+        });
+
+        const actions = document.createElement('td');
+
+        const print = document.createElement('button');
+        print.className = 'btn-view';
+        print.textContent = 'Print';
+        print.onclick = () => printFeeChallan(c.id);
+
+        const payment = document.createElement('button');
+        payment.className = 'btn-edit';
+        payment.textContent = 'Payment';
+        payment.onclick = () => recordFeePayment(c.id);
+
+        actions.appendChild(print);
+        actions.appendChild(payment);
+        tr.appendChild(actions);
+
+        body.appendChild(tr);
+    });
+
+    if(!records.length){
+        body.innerHTML = '<tr><td colspan="9">No challan records found.</td></tr>';
+    }
+
+    document.getElementById('feeTotalChallans').textContent = records.length;
+    document.getElementById('feeTotalAmount').textContent = formatPKR(totalAmount);
+    document.getElementById('feeReceived').textContent = formatPKR(received);
+    document.getElementById('feeRemaining').textContent = formatPKR(remaining);
+}
+
+function recordFeePayment(id){
+    const challans = getFeeChallans();
+    const index = challans.findIndex(c => String(c.id) === String(id));
+
+    if(index < 0) return alert('Challan not found.');
+
+    const challan = challans[index];
+
+    if(challan.balance <= 0){
+        alert('This challan is already fully paid.');
+        return;
+    }
+
+    const amount = Number(prompt(
+        'Remaining balance: ' + formatPKR(challan.balance) +
+        '\nEnter payment received:'
+    ));
+
+    if(!Number.isFinite(amount) || amount <= 0){
+        alert('Please enter a valid payment amount.');
+        return;
+    }
+
+    if(amount > challan.balance){
+        alert('Payment cannot be greater than remaining balance.');
+        return;
+    }
+
+    challan.paid = Number(challan.paid || 0) + amount;
+    challan.balance = Number(challan.total) - challan.paid;
+
+    challan.status = challan.balance === 0 ? 'Paid' : 'Partial';
+
+    const payments = getFeePayments();
+
+    payments.push({
+        id: 'PAY-' + Date.now(),
+        challanId: challan.id,
+        challanNo: challan.challanNo,
+        studentName: challan.studentName,
+        amount: amount,
+        date: todayISO(),
+        month: challan.month
+    });
+
+    saveFeePayments(payments);
+    saveFeeChallans(challans);
+
+    alert('Payment saved successfully.');
+    renderFeeRecords();
+}
+
+function printFeeChallan(id){
+    const challan = getFeeChallans().find(c => String(c.id) === String(id));
+
+    if(!challan){
+        alert('Challan not found.');
+        return;
+    }
+
+    const w = window.open('', '_blank', 'width=950,height=750');
+
+    if(!w){
+        alert('Please allow pop-ups to print challan.');
+        return;
+    }
+
+    const copies = ['SCHOOL COPY', 'BANK COPY', 'PARENT COPY'];
+
+    const html = copies.map(copy => `
+        <div class="challan">
+            <div class="top">
+                <h2>${escapeHtml(challan.school || 'School')}</h2>
+                <h3>FEE CHALLAN</h3>
+                <b>${copy}</b>
+            </div>
+
+            <hr>
+
+            <div class="details">
+                <p><b>Challan No:</b> ${escapeHtml(challan.challanNo)}</p>
+                <p><b>Fee Month:</b> ${escapeHtml(challan.month)}</p>
+                <p><b>Issue Date:</b> ${escapeHtml(challan.issueDate)}</p>
+                <p><b>Due Date:</b> ${escapeHtml(challan.dueDate || '-')}</p>
+                <p><b>Student Name:</b> ${escapeHtml(challan.studentName)}</p>
+                <p><b>Father Name:</b> ${escapeHtml(challan.fatherName)}</p>
+                <p><b>Admission No:</b> ${escapeHtml(challan.admissionNo)}</p>
+                <p><b>Class:</b> ${escapeHtml(challan.className)} / ${escapeHtml(challan.section)}</p>
+            </div>
+
+            <table>
+                <tr><th>Description</th><th>Amount</th></tr>
+                <tr><td>Monthly Tuition Fee</td><td>${formatPKR(challan.monthlyFee)}</td></tr>
+                <tr><td>Additional Fee</td><td>${formatPKR(challan.additionalFee)}</td></tr>
+                <tr><th>Total Fee</th><th>${formatPKR(challan.total)}</th></tr>
+                <tr><td>Paid</td><td>${formatPKR(challan.paid)}</td></tr>
+                <tr><th>Remaining Balance</th><th>${formatPKR(challan.balance)}</th></tr>
+            </table>
+
+            <p><b>Payment Status:</b> ${escapeHtml(challan.status)}</p>
+
+            <div class="sign">
+                <span>Cashier Signature</span>
+                <span>Principal Signature</span>
+            </div>
+        </div>
+    `).join('');
+
+    w.document.write(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Fee Challan</title>
+    <meta charset="UTF-8">
+    <style>
+    body{font-family:Arial;padding:15px;color:#222}
+    .challan{border:1px solid #888;padding:18px;margin:0 auto 20px;max-width:750px;page-break-after:always}
+    .top{text-align:center;color:#087443}
+    .details{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}
+    .details p{margin:7px 0}
+    table{width:100%;border-collapse:collapse;margin-top:15px}
+    th,td{border:1px solid #888;padding:9px;text-align:left}
+    th{background:#edf7f1}
+    .sign{display:flex;justify-content:space-between;margin-top:55px}
+    .sign span{border-top:1px solid #333;padding-top:7px;width:35%;text-align:center}
+    @media print{body{padding:0}.challan{margin:0 auto 12px}}
+    </style>
+    </head>
+    <body>
+    ${html}
+    <script>window.onload=function(){setTimeout(function(){window.print();},300);};<\/script>
+    </body>
+    </html>
+    `);
+
+    w.document.close();
+}
+
+/* FEES INITIALIZATION */
+
+function initializeFees(){
+    const settings = getFeeSettings();
+
+    document.getElementById('defaultMonthlyFee').value = settings.defaultFee || '';
+    document.getElementById('feeDueDate').value = settings.dueDate || '';
+
+    const month = todayISO().slice(0,7);
+
+    document.getElementById('challanMonth').value = month;
+    document.getElementById('feeRecordMonth').value = month;
+
+    renderFeeStudents();
+    renderFeeRecords();
+}
+
 /* INITIAL LOAD */
 renderStudents();
 renderTeachers();
