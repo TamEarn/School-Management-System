@@ -165,3 +165,463 @@ small{color:#777}.form-heading{margin-top:25px;margin-bottom:15px;color:#087443}
 <div class="table-wrap"><table><thead><tr><th>Photo</th><th>Teacher ID</th><th>Teacher Name</th><th>CNIC</th><th>Subjects</th><th>School ID</th><th>Status</th><th>Actions</th></tr></thead><tbody id="teacherTable"></tbody></table></div>
 </div>
 </section>
+
+<section id="staff" class="section">
+<div class="card">
+<h2 id="staffFormTitle">Add Other Staff</h2>
+<form id="staffForm">
+<div class="form-grid">
+<div><label>Staff Name *</label><input id="staffName" required></div>
+<div><label>Father Name</label><input id="staffFather"></div>
+<div><label>Staff Category *</label><select id="staffCategory" required><option value="">Select Category</option><option>Admin Staff</option><option>Office Staff</option><option>Accounts Staff</option><option>Support Staff</option><option>Security Staff</option><option>Other Staff</option></select></div>
+<div><label>CNIC</label><input id="staffCnic" maxlength="15" placeholder="XXXXX-XXXXXXX-X"></div>
+<div><label>Mobile *</label><input id="staffMobile" required type="tel"></div>
+<div><label>Email</label><input id="staffEmail" type="email"></div>
+<div><label>School ID *</label><input id="staffSchoolId" required></div>
+<div><label>Status</label><select id="staffStatus"><option>Active</option><option>Inactive</option></select></div>
+<div style="grid-column:1/-1"><label>Address</label><input id="staffAddress"></div>
+</div>
+<button class="btn" id="staffSubmitBtn" type="submit">Save Staff</button>
+<button class="btn btn-secondary" type="button" id="cancelStaffEdit" onclick="resetStaffForm()" style="display:none">Cancel Edit</button>
+</form>
+</div>
+<div class="card">
+<h2>Other Staff List</h2>
+<input class="search" id="staffSearch" placeholder="Search staff..." oninput="searchStaff()">
+<div class="table-wrap"><table><thead><tr><th>Staff ID</th><th>Name</th><th>Category</th><th>Mobile</th><th>School ID</th><th>Status</th><th>Action</th></tr></thead><tbody id="staffTable"></tbody></table></div>
+</div>
+</section>
+
+<section id="attendance" class="section">
+<div class="card">
+<h2>Attendance Management</h2>
+<div class="attendance-filters">
+<div><label>Date</label><input type="date" id="attendanceDate"></div>
+<div><label>School / Campus</label><select id="attendanceSchool"><option value="main">Main School</option><option value="branch1">City Campus</option><option value="branch2">Model Campus</option></select></div>
+<div><label>Category</label><select id="attendanceCategory"><option>Students</option><option>Teachers</option><option>Other Staff</option></select></div>
+<div id="attendanceClassWrap"><label>Class</label><select id="attendanceClass"><option value="">All Classes</option><option>Play Group</option><option>Nursery</option><option>KG</option><option>Class 1</option><option>Class 2</option><option>Class 3</option><option>Class 4</option><option>Class 5</option><option>Class 6</option><option>Class 7</option><option>Class 8</option><option>Class 9</option><option>Class 10</option><option>Class 11</option><option>Class 12</option></select></div>
+<div id="attendanceSectionWrap"><label>Section</label><select id="attendanceSection"><option value="">All Sections</option><option>Primary</option><option>Middle</option><option>Secondary</option><option>Higher Secondary</option></select></div>
+</div>
+<div class="attendance-actions no-print">
+<button class="btn btn-small" type="button" onclick="loadAttendanceRoster()">Load Members</button>
+<button class="btn btn-small" type="button" onclick="markAllPresent()">Mark All Present</button>
+<button class="btn btn-small" type="button" onclick="saveAttendance()">Save & Update</button>
+<button class="btn btn-secondary btn-small" type="button" onclick="printAttendance()">Print Sheet</button>
+</div>
+<p id="attendanceMessage">Select filters and load members.</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>ID / Admission No.</th><th>Name</th><th>Class / Category</th><th>Status</th></tr></thead><tbody id="attendanceTable"></tbody></table></div>
+</div>
+<div class="card">
+<h2>Daily Summary</h2>
+<div class="stats">
+<div class="stat"><h3>Total</h3><strong id="dailyTotal">0</strong></div>
+<div class="stat"><h3>Present</h3><strong id="dailyPresent">0</strong></div>
+<div class="stat"><h3>Absent</h3><strong id="dailyAbsent">0</strong></div>
+<div class="stat"><h3>Leave</h3><strong id="dailyLeave">0</strong></div>
+<div class="stat"><h3>Late</h3><strong id="dailyLate">0</strong></div>
+</div>
+</div>
+<div class="card">
+<h2>Monthly Attendance Report</h2>
+<div class="form-grid no-print">
+<div><label>Month</label><input type="month" id="reportMonth"></div>
+<div><label>Category</label><select id="reportCategory"><option value="All">All Categories</option><option>Students</option><option>Teachers</option><option>Other Staff</option></select></div>
+</div>
+<button class="btn btn-small no-print" onclick="renderMonthlyReport()">Generate Report</button>
+<div class="table-wrap"><table><thead><tr><th>Date</th><th>Category</th><th>School</th><th>Total</th><th>Present</th><th>Absent</th><th>Leave</th><th>Late</th><th>Action</th></tr></thead><tbody id="monthlyReportTable"></tbody></table></div>
+</div>
+</section>
+
+<section id="fees" class="section"><div class="card"><h2>Fees Management</h2><p>Fees module will be developed next.</p></div></section>
+<section id="exams" class="section"><div class="card"><h2>Exams & Results</h2><p>Examination module will be developed next.</p></div></section>
+<section id="timetable" class="section"><div class="card"><h2>Timetable</h2><p>Timetable module will be developed next.</p></div></section>
+<section id="reports" class="section"><div class="card"><h2>Reports</h2><p>Reports module will be developed next.</p></div></section>
+<section id="settings" class="section"><div class="card"><h2>Settings</h2><p>School management settings.</p></div></section>
+</main>
+</div>
+
+<script>
+let editingStudentId=null;
+
+function showSection(id,button){
+document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+document.querySelectorAll('.sidebar button').forEach(b=>b.classList.remove('active'));
+document.getElementById(id).classList.add('active');
+if(button)button.classList.add('active');
+}
+function getSchoolName(id){
+return {main:'Main School',branch1:'City Campus',branch2:'Model Campus'}[id]||id||'Main School';
+}
+function getSafe(value){return value==null?'':String(value)}
+
+/* STUDENTS */
+function renderStudents(){
+if(typeof getStudents!=='function')return;
+const students=getStudents()||[],table=document.getElementById('studentTable');
+table.innerHTML='';
+students.forEach(s=>{
+const row=document.createElement('tr');
+[s.admissionNo,s.name,s.fatherName,s.class,s.section,s.phone,s.status].forEach(value=>{
+const td=document.createElement('td');td.textContent=getSafe(value)||'-';row.appendChild(td);
+});
+const cell=document.createElement('td'),edit=document.createElement('button');
+edit.type='button';edit.className='btn-edit';edit.textContent='Edit';edit.onclick=()=>editStudent(s.id);
+cell.appendChild(edit);row.appendChild(cell);table.appendChild(row);
+});
+document.getElementById('totalStudents').textContent=students.length;
+}
+function editStudent(id){
+const student=(getStudents()||[]).find(s=>String(s.id)===String(id));
+if(!student)return alert('Student record not found.');
+editingStudentId=id;
+const fields={admissionNo:student.admissionNo,studentName:student.name,fatherName:student.fatherName,dob:student.dob,gender:student.gender,admissionDate:student.admissionDate,studentSchool:student.school||'main',studentClass:student.class,studentSection:student.section,rollNumber:student.rollNumber,previousSchool:student.previousSchool,studentStatus:student.status||'Active',studentPhone:student.phone,emergencyContact:student.emergencyContact,studentAddress:student.address};
+Object.keys(fields).forEach(k=>document.getElementById(k).value=getSafe(fields[k]));
+studentFormTitle.textContent='Edit Student Information';
+studentSubmitBtn.textContent='Update Student';
+cancelEditBtn.style.display='inline-block';
+studentForm.scrollIntoView({behavior:'smooth'});
+}
+function cancelStudentEdit(){
+editingStudentId=null;studentForm.reset();studentFormTitle.textContent='Student Admission Form';
+studentSubmitBtn.textContent='Save Student Admission';cancelEditBtn.style.display='none';
+}
+studentForm.addEventListener('submit',e=>{
+e.preventDefault();
+if(typeof getStudents!=='function')return alert('Student functions not found in app.js');
+const student={
+admissionNo:admissionNo.value.trim(),name:studentName.value.trim(),fatherName:fatherName.value.trim(),
+dob:dob.value,gender:gender.value,admissionDate:admissionDate.value,school:studentSchool.value,
+class:studentClass.value,section:studentSection.value,rollNumber:rollNumber.value.trim(),
+previousSchool:previousSchool.value.trim(),status:studentStatus.value,phone:studentPhone.value.trim(),
+emergencyContact:emergencyContact.value.trim(),address:studentAddress.value.trim()
+};
+const students=getStudents()||[];
+const duplicate=students.some(s=>s.admissionNo&&s.admissionNo.toLowerCase()===student.admissionNo.toLowerCase()&&String(s.id)!==String(editingStudentId));
+if(duplicate)return alert('This admission number is already in use.');
+if(editingStudentId!==null){
+if(typeof updateStudent==='function')updateStudent(editingStudentId,student);
+else{
+const i=students.findIndex(s=>String(s.id)===String(editingStudentId));
+if(i<0)return alert('Student record not found.');
+students[i]={...students[i],...student};localStorage.setItem('students',JSON.stringify(students));
+}
+alert('Student information updated successfully!');
+}else{
+if(typeof addStudent!=='function')return alert('addStudent function not found in app.js');
+addStudent(student);alert('Student admission saved successfully!');
+}
+cancelStudentEdit();renderStudents();
+});
+function searchStudents(){
+const q=studentSearch.value.toLowerCase();
+document.querySelectorAll('#studentTable tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
+}
+
+/* TEACHERS */
+let editingTeacherId=null,currentTeacherPhoto='',teacherSubjectCount=0;
+function getTeacherRecords(){return typeof getTeachers==='function'?(getTeachers()||[]):[]}
+function generateTeacherId(){
+let highest=getTeacherRecords().length;
+getTeacherRecords().forEach(t=>{const m=String(t.teacherId||'').match(/^TCH-(\d+)$/i);if(m)highest=Math.max(highest,Number(m[1]))});
+return 'TCH-'+String(highest+1).padStart(3,'0');
+}
+function addTeacherSubject(value=''){
+if(teacherSubjectCount>=8)return alert('Maximum 8 subjects are allowed.');
+teacherSubjectCount++;
+const wrap=document.createElement('div');wrap.className='subject-item';
+const input=document.createElement('input');input.type='text';input.className='teacher-subject-input';input.placeholder='Subject '+teacherSubjectCount;input.value=value;
+const remove=document.createElement('button');remove.type='button';remove.className='subject-remove';remove.textContent='Remove';
+remove.onclick=()=>{wrap.remove();teacherSubjectCount=document.querySelectorAll('.teacher-subject-input').length;updateSubjectButton()};
+wrap.append(input,remove);teacherSubjects.appendChild(wrap);updateSubjectButton();
+}
+function updateSubjectButton(){addSubjectBtn.disabled=teacherSubjectCount>=8;addSubjectBtn.style.opacity=teacherSubjectCount>=8?'.5':'1'}
+function resetTeacherSubjects(subjects=[]){
+teacherSubjects.innerHTML='';teacherSubjectCount=0;
+(subjects.length?subjects:['']).slice(0,8).forEach(s=>addTeacherSubject(s));
+}
+function resetTeacherForm(){
+editingTeacherId=null;currentTeacherPhoto='';teacherForm.reset();teacherId.value=generateTeacherId();
+teacherFormTitle.textContent='Add Teacher';teacherSubmitBtn.textContent='Add Teacher';
+cancelTeacherEditBtn.style.display='none';teacherPhotoPreview.src='';teacherPhotoPreview.style.display='none';
+resetTeacherSubjects(['']);
+}
+function renderTeachers(){
+if(typeof getTeachers!=='function')return;
+const table=document.getElementById('teacherTable');table.innerHTML='';
+getTeacherRecords().forEach(t=>{
+const row=document.createElement('tr'),photoCell=document.createElement('td');
+if(t.photo){const img=document.createElement('img');img.src=t.photo;img.className='teacher-thumb';img.alt='Teacher photo';photoCell.appendChild(img)}else photoCell.textContent='-';
+row.appendChild(photoCell);
+[getSafe(t.teacherId)||'-',getSafe(t.name)||'-',getSafe(t.cnic)||'-',(Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[])).join(', ')||'-',getSafe(t.schoolId)||getSafe(t.school)||'-',getSafe(t.status)||'Active'].forEach(v=>{const td=document.createElement('td');td.textContent=v;row.appendChild(td)});
+const actions=document.createElement('td'),edit=document.createElement('button'),view=document.createElement('button');
+edit.type='button';edit.className='btn-edit';edit.textContent='Edit';edit.onclick=()=>editTeacher(t.id);
+view.type='button';view.className='btn-view';view.textContent='View / Print';view.onclick=()=>printTeacher(t.id);
+actions.append(edit,view);row.appendChild(actions);table.appendChild(row);
+});
+totalTeachers.textContent=getTeacherRecords().length;
+}
+function editTeacher(id){
+const t=getTeacherRecords().find(x=>String(x.id)===String(id));
+if(!t)return alert('Teacher record not found.');
+editingTeacherId=id;currentTeacherPhoto=t.photo||'';
+const fields={teacherId:t.teacherId||generateTeacherId(),teacherName:t.name,teacherFather:t.fatherName,teacherCnic:t.cnic,teacherGender:t.gender,teacherQualification:t.qualification,teacherStatus:t.status||'Active',teacherSchoolId:t.schoolId||t.school,teacherMobile:t.mobile,teacherWhatsapp:t.whatsapp,teacherEmail:t.email,teacherAddress:t.address};
+Object.keys(fields).forEach(k=>document.getElementById(k).value=getSafe(fields[k]));
+resetTeacherSubjects(Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[]));
+if(currentTeacherPhoto){teacherPhotoPreview.src=currentTeacherPhoto;teacherPhotoPreview.style.display='block'}else{teacherPhotoPreview.src='';teacherPhotoPreview.style.display='none'}
+teacherFormTitle.textContent='Edit Teacher Information';teacherSubmitBtn.textContent='Update Teacher';
+cancelTeacherEditBtn.style.display='inline-block';teacherForm.scrollIntoView({behavior:'smooth'});
+}
+function cancelTeacherEdit(){resetTeacherForm()}
+
+teacherPhoto.addEventListener('change',function(){
+const file=this.files&&this.files[0];if(!file)return;
+if(!file.type.startsWith('image/')){alert('Please select a valid image.');this.value='';return}
+if(file.size>1024*1024){alert('Photo size must be 1 MB or less.');this.value='';return}
+const reader=new FileReader();
+reader.onload=()=>{currentTeacherPhoto=reader.result;teacherPhotoPreview.src=currentTeacherPhoto;teacherPhotoPreview.style.display='block'};
+reader.readAsDataURL(file);
+});
+teacherCnic.addEventListener('input',function(){
+const d=this.value.replace(/\D/g,'').slice(0,13);
+this.value=d.length>12?d.slice(0,5)+'-'+d.slice(5,12)+'-'+d.slice(12):d.length>5?d.slice(0,5)+'-'+d.slice(5):d;
+});
+teacherForm.addEventListener('submit',e=>{
+e.preventDefault();
+if(typeof addTeacher!=='function')return alert('addTeacher function not found in js/app.js.');
+const cnic=teacherCnic.value.trim();
+if(!/^\d{5}-\d{7}-\d$/.test(cnic))return alert('Enter CNIC like 12345-1234567-1');
+const teachers=getTeacherRecords();
+if(teachers.some(t=>String(t.cnic||'')===cnic&&String(t.id)!==String(editingTeacherId)))return alert('This CNIC is already registered.');
+const subjects=Array.from(document.querySelectorAll('.teacher-subject-input')).map(x=>x.value.trim()).filter(Boolean);
+if(!subjects.length)return alert('Please enter at least one subject.');
+const t={
+teacherId:teacherId.value.trim(),name:teacherName.value.trim(),fatherName:teacherFather.value.trim(),
+cnic,gender:teacherGender.value,qualification:teacherQualification.value.trim(),status:teacherStatus.value,
+schoolId:teacherSchoolId.value.trim(),mobile:teacherMobile.value.trim(),whatsapp:teacherWhatsapp.value.trim(),
+email:teacherEmail.value.trim(),address:teacherAddress.value.trim(),subjects,photo:currentTeacherPhoto
+};
+if(editingTeacherId!==null){
+const i=teachers.findIndex(x=>String(x.id)===String(editingTeacherId));
+if(i<0)return alert('Teacher record not found.');
+if(typeof updateTeacher==='function')updateTeacher(editingTeacherId,t);
+else{teachers[i]={...teachers[i],...t};localStorage.setItem('teachers',JSON.stringify(teachers))}
+alert('Teacher information updated successfully!');
+}else{addTeacher(t);alert('Teacher added successfully!')}
+resetTeacherForm();renderTeachers();
+});
+function escapeHtml(v){
+return getSafe(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function printTeacher(id){
+const t=getTeacherRecords().find(x=>String(x.id)===String(id));
+if(!t)return alert('Teacher record not found.');
+const subjects=Array.isArray(t.subjects)?t.subjects:(t.subject?[t.subject]:[]);
+const photo=t.photo?'<img class="photo" src="'+t.photo+'">':'<div class="photo empty">No Photo</div>';
+const popup=window.open('','_blank','width=900,height=700');
+if(!popup)return alert('Please allow pop-ups to print teacher profile.');
+popup.document.write(`<!DOCTYPE html><html><head><title>Teacher Profile - ${escapeHtml(t.name)}</title><meta charset="UTF-8">
+<style>
+*{box-sizing:border-box}body{font-family:Arial;color:#222;margin:0;padding:28px}
+.page{max-width:800px;margin:auto;border:1px solid #ddd;padding:30px}
+.top{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #087443;padding-bottom:18px}
+.top h1{color:#087443;margin:0 0 6px}.photo{width:115px;height:130px;object-fit:cover;border:1px solid #bbb}
+.empty{display:flex;align-items:center;justify-content:center;color:#777;font-size:12px}
+.section-title{background:#edf7f1;color:#087443;padding:9px;margin:22px 0 10px;font-weight:bold}
+.details{display:grid;grid-template-columns:1fr 1fr;gap:12px 24px}
+.field{border-bottom:1px solid #eee;padding:7px 0}.field b{display:block;font-size:12px;color:#666;margin-bottom:4px}
+.subjects{line-height:1.8}.signatures{display:flex;justify-content:space-between;margin-top:85px}
+.signatures div{width:38%;border-top:1px solid #333;text-align:center;padding-top:8px}
+.footer{margin-top:30px;text-align:center;color:#777;font-size:11px}
+@media print{body{padding:0}.page{border:0;padding:15mm}}
+</style></head><body><div class="page">
+<div class="top"><div><h1>Teacher Profile</h1><div>School Management System</div><p><b>Teacher ID:</b> ${escapeHtml(t.teacherId||'-')}</p></div>${photo}</div>
+<div class="section-title">Personal Information</div><div class="details">
+<div class="field"><b>Teacher Name</b>${escapeHtml(t.name||'-')}</div>
+<div class="field"><b>Father Name</b>${escapeHtml(t.fatherName||'-')}</div>
+<div class="field"><b>CNIC Number</b>${escapeHtml(t.cnic||'-')}</div>
+<div class="field"><b>Gender</b>${escapeHtml(t.gender||'-')}</div>
+<div class="field"><b>Qualification</b>${escapeHtml(t.qualification||'-')}</div>
+<div class="field"><b>Employment Status</b>${escapeHtml(t.status||'Active')}</div>
+<div class="field"><b>School ID</b>${escapeHtml(t.schoolId||t.school||'-')}</div></div>
+<div class="section-title">Contact Information</div><div class="details">
+<div class="field"><b>Mobile Number</b>${escapeHtml(t.mobile||'-')}</div>
+<div class="field"><b>WhatsApp Number</b>${escapeHtml(t.whatsapp||'-')}</div>
+<div class="field"><b>Email Address</b>${escapeHtml(t.email||'-')}</div>
+<div class="field"><b>Address</b>${escapeHtml(t.address||'-')}</div></div>
+<div class="section-title">Subjects Taught</div><div class="subjects">${subjects.length?subjects.map(escapeHtml).join(' | '):'-'}</div>
+<div class="signatures"><div>Teacher Signature</div><div>Principal Signature</div></div>
+<div class="footer">Printed from School Management System</div></div>
+<script>window.onload=function(){setTimeout(function(){window.print()},400)};<\/script>
+</body></html>`);
+popup.document.close();
+}
+function searchTeachers(){
+const q=teacherSearch.value.toLowerCase();
+document.querySelectorAll('#teacherTable tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
+}
+
+/* OTHER STAFF */
+let editingStaffId=null;
+function getStaffRecords(){try{return JSON.parse(localStorage.getItem('schoolStaff')||'[]')}catch(e){return []}}
+function saveStaffRecords(a){localStorage.setItem('schoolStaff',JSON.stringify(a))}
+function generateStaffId(){
+const max=getStaffRecords().reduce((m,x)=>Math.max(m,parseInt(String(x.staffId||'').replace(/\D/g,''))||0),0);
+return 'STF-'+String(max+1).padStart(3,'0');
+}
+function resetStaffForm(){
+editingStaffId=null;staffForm.reset();staffFormTitle.textContent='Add Other Staff';
+staffSubmitBtn.textContent='Save Staff';cancelStaffEdit.style.display='none';
+}
+function renderStaff(){
+const body=document.getElementById('staffTable');body.innerHTML='';
+getStaffRecords().forEach(x=>{
+const row=document.createElement('tr');
+[x.staffId,x.name,x.category,x.mobile,x.schoolId,x.status].forEach(v=>{
+const td=document.createElement('td');td.textContent=v||'-';row.appendChild(td);
+});
+const cell=document.createElement('td'),btn=document.createElement('button');
+btn.className='btn-edit';btn.textContent='Edit';btn.onclick=()=>editStaff(x.id);
+cell.appendChild(btn);row.appendChild(cell);body.appendChild(row);
+});
+}
+function editStaff(id){
+const x=getStaffRecords().find(a=>String(a.id)===String(id));
+if(!x)return;
+editingStaffId=id;
+const fields={staffName:x.name,staffFather:x.fatherName,staffCategory:x.category,staffCnic:x.cnic,staffMobile:x.mobile,staffEmail:x.email,staffSchoolId:x.schoolId,staffStatus:x.status||'Active',staffAddress:x.address};
+Object.keys(fields).forEach(k=>document.getElementById(k).value=getSafe(fields[k]));
+staffFormTitle.textContent='Edit Staff';staffSubmitBtn.textContent='Update Staff';
+cancelStaffEdit.style.display='inline-block';
+}
+function searchStaff(){
+const q=staffSearch.value.toLowerCase();
+document.querySelectorAll('#staffTable tr').forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?'':'none');
+}
+staffForm.addEventListener('submit',e=>{
+e.preventDefault();
+const a=getStaffRecords();
+const old=a.find(x=>String(x.id)===String(editingStaffId));
+const d={
+staffId:old?old.staffId:generateStaffId(),name:staffName.value.trim(),
+fatherName:staffFather.value.trim(),category:staffCategory.value,cnic:staffCnic.value.trim(),
+mobile:staffMobile.value.trim(),email:staffEmail.value.trim(),schoolId:staffSchoolId.value.trim(),
+status:staffStatus.value,address:staffAddress.value.trim()
+};
+if(editingStaffId){
+const i=a.findIndex(x=>String(x.id)===String(editingStaffId));
+if(i<0)return alert('Staff not found.');
+a[i]={...a[i],...d};
+}else{d.id='STAFF-'+Date.now();a.push(d)}
+saveStaffRecords(a);resetStaffForm();renderStaff();alert('Staff saved successfully!');
+});
+
+/* ATTENDANCE */
+const ATTENDANCE_KEY='schoolAttendance';
+let attendanceRoster=[];
+function getAttendanceRecords(){try{return JSON.parse(localStorage.getItem(ATTENDANCE_KEY)||'[]')}catch(e){return []}}
+function setAttendanceRecords(a){localStorage.setItem(ATTENDANCE_KEY,JSON.stringify(a))}
+function todayISO(){
+const d=new Date();
+return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function attendanceFilter(){
+return {date:attendanceDate.value,school:attendanceSchool.value,category:attendanceCategory.value,className:attendanceClass.value,section:attendanceSection.value};
+}
+function toggleStudentFilters(){
+const isStudent=attendanceCategory.value==='Students';
+attendanceClassWrap.style.display=isStudent?'block':'none';
+attendanceSectionWrap.style.display=isStudent?'block':'none';
+}
+function getRosterForFilter(f){
+let list=[];
+if(f.category==='Students'){
+list=(typeof getStudents==='function'?getStudents():[]).filter(x=>(x.status||'Active')==='Active'&&(x.school||'main')===f.school&&(!f.className||x.class===f.className)&&(!f.section||x.section===f.section)).map(x=>({id:String(x.id),code:x.admissionNo||x.id,name:x.name||'',group:[x.class,x.section].filter(Boolean).join(' / ')}));
+}else if(f.category==='Teachers'){
+list=getTeacherRecords().filter(x=>(x.status||'Active')==='Active'&&(x.schoolId===f.school||x.school===f.school||(!x.schoolId&&!x.school))).map(x=>({id:String(x.id),code:x.teacherId||x.id,name:x.name||'',group:'Teacher'}));
+}else{
+list=getStaffRecords().filter(x=>(x.status||'Active')==='Active'&&(x.schoolId===f.school||!x.schoolId)).map(x=>({id:String(x.id),code:x.staffId||x.id,name:x.name||'',group:x.category||'Other Staff'}));
+}
+return list;
+}
+function loadAttendanceRoster(){
+const f=attendanceFilter();
+if(!f.date)return alert('Select date.');
+attendanceRoster=getRosterForFilter(f);
+const old=getAttendanceRecords().find(x=>x.date===f.date&&x.school===f.school&&x.category===f.category&&x.className===f.className&&x.section===f.section);
+attendanceRoster=attendanceRoster.map(p=>({...p,status:old?((old.records.find(r=>String(r.personId)===p.id)||{}).status||'Present'):'Present'}));
+renderAttendanceTable();updateDailySummary();
+attendanceMessage.textContent=attendanceRoster.length+' active members loaded.';
+}
+function renderAttendanceTable(){
+attendanceTable.innerHTML='';
+attendanceRoster.forEach((p,i)=>{
+const row=document.createElement('tr');
+[i+1,p.code,p.name,p.group].forEach(v=>{const td=document.createElement('td');td.textContent=v||'-';row.appendChild(td)});
+const td=document.createElement('td'),select=document.createElement('select');
+['Present','Absent','Leave','Late'].forEach(v=>{const o=document.createElement('option');o.value=v;o.textContent=v;o.selected=(p.status||'Present')===v;select.appendChild(o)});
+select.onchange=()=>{attendanceRoster[i].status=select.value;updateDailySummary()};
+td.appendChild(select);row.appendChild(td);attendanceTable.appendChild(row);
+});
+}
+function markAllPresent(){
+attendanceRoster=attendanceRoster.map(x=>({...x,status:'Present'}));
+renderAttendanceTable();updateDailySummary();
+}
+function countAttendance(){
+return attendanceRoster.reduce((a,x)=>(a[x.status]=(a[x.status]||0)+1,a),{Present:0,Absent:0,Leave:0,Late:0});
+}
+function updateDailySummary(){
+const c=countAttendance();
+dailyTotal.textContent=attendanceRoster.length;
+dailyPresent.textContent=c.Present;dailyAbsent.textContent=c.Absent;
+dailyLeave.textContent=c.Leave;dailyLate.textContent=c.Late;
+todayAttendance.textContent=(attendanceRoster.length?Math.round(c.Present/attendanceRoster.length*100):0)+'%';
+}
+function saveAttendance(){
+const f=attendanceFilter();
+if(!f.date)return alert('Select date.');
+if(!attendanceRoster.length)return alert('Load members first.');
+const a=getAttendanceRecords();
+const rec={...f,records:attendanceRoster.map(p=>({personId:p.id,code:p.code,name:p.name,group:p.group,status:p.status||'Present'})),updatedAt:new Date().toISOString()};
+const i=a.findIndex(x=>x.date===f.date&&x.school===f.school&&x.category===f.category&&x.className===f.className&&x.section===f.section);
+if(i>=0)a[i]=rec;else a.push(rec);
+setAttendanceRecords(a);alert('Attendance saved / updated.');renderMonthlyReport();
+}
+function renderMonthlyReport(){
+if(!reportMonth.value)return;
+monthlyReportTable.innerHTML='';
+getAttendanceRecords().filter(x=>x.date.startsWith(reportMonth.value)&&(reportCategory.value==='All'||x.category===reportCategory.value)).sort((a,b)=>a.date.localeCompare(b.date)).forEach(x=>{
+const c=x.records.reduce((a,r)=>(a[r.status]=(a[r.status]||0)+1,a),{Present:0,Absent:0,Leave:0,Late:0});
+const values=[x.date,x.category,getSchoolName(x.school),x.records.length,c.Present,c.Absent,c.Leave,c.Late];
+const row=document.createElement('tr');
+values.forEach(v=>{const td=document.createElement('td');td.textContent=v;row.appendChild(td)});
+const td=document.createElement('td'),btn=document.createElement('button');
+btn.className='btn-edit';btn.textContent='Load / Edit';
+btn.onclick=()=>{
+attendanceDate.value=x.date;attendanceSchool.value=x.school;attendanceCategory.value=x.category;
+attendanceClass.value=x.className||'';attendanceSection.value=x.section||'';
+toggleStudentFilters();loadAttendanceRoster();
+};
+td.appendChild(btn);row.appendChild(td);monthlyReportTable.appendChild(row);
+});
+}
+function printAttendance(){
+if(!attendanceRoster.length)return alert('Load attendance first.');
+window.print();
+}
+attendanceCategory.addEventListener('change',toggleStudentFilters);
+
+/* INITIAL LOAD */
+renderStudents();
+renderTeachers();
+resetTeacherForm();
+renderStaff();
+resetStaffForm();
+attendanceDate.value=todayISO();
+reportMonth.value=todayISO().slice(0,7);
+toggleStudentFilters();
+renderMonthlyReport();
+updateDailySummary();
+</script>
+</body>
+</html>
